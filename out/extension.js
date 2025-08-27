@@ -4,20 +4,31 @@ exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const contextoCore_1 = require("./contextoCore");
 const treeProvider_1 = require("./treeProvider");
+const welcomeWebview_1 = require("./welcomeWebview");
+const configErrorWebview_1 = require("./configErrorWebview");
+const types_1 = require("./types");
 const logger_1 = require("./logger");
 let core = null;
 let treeProvider;
 let statusProvider;
+let welcomeProvider;
+let configErrorProvider;
 function activate(context) {
     console.log('Contexto插件已激活');
     // 初始化providers
     treeProvider = new treeProvider_1.ContextoProvider();
     statusProvider = new treeProvider_1.ContextoStatusProvider();
+    welcomeProvider = new welcomeWebview_1.WelcomeWebviewProvider(context.extensionUri);
+    configErrorProvider = new configErrorWebview_1.ConfigErrorWebviewProvider(context.extensionUri);
     // 注册tree view
     const treeView = vscode.window.createTreeView('contexto', {
         treeDataProvider: treeProvider,
         showCollapseAll: true
     });
+    // 注册welcome webview
+    const welcomeView = vscode.window.registerWebviewViewProvider(welcomeWebview_1.WelcomeWebviewProvider.viewType, welcomeProvider);
+    // 注册config error webview
+    const configErrorView = vscode.window.registerWebviewViewProvider(configErrorWebview_1.ConfigErrorWebviewProvider.viewType, configErrorProvider);
     // 检查工作区并初始化
     initializeWorkspace();
     // 注册命令
@@ -34,29 +45,58 @@ function activate(context) {
         }
     });
     // 添加到订阅列表
-    context.subscriptions.push(treeView, statusProvider, ...Object.values(commands));
+    context.subscriptions.push(treeView, welcomeView, configErrorView, statusProvider, ...Object.values(commands));
 }
 exports.activate = activate;
 async function initializeWorkspace() {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders || workspaceFolders.length === 0) {
         core = null;
+        await setViewVisibility('none');
         statusProvider.updateStatus(null, null);
-        treeProvider.refresh();
+        await treeProvider.setCore(null);
         return;
     }
     const workspaceRoot = workspaceFolders[0].uri.fsPath;
     core = new contextoCore_1.ContextoCore(workspaceRoot);
+    if (!core.isInitialized()) {
+        // 项目未初始化，显示欢迎界面
+        await setViewVisibility('welcome');
+        welcomeProvider.setCore(core);
+        await treeProvider.setCore(core);
+        statusProvider.updateStatus(core, null);
+        return;
+    }
+    // 项目已初始化，尝试加载配置
     const initialized = await core.initialize();
-    if (initialized) {
+    const projectStatus = core.getProjectStatus();
+    if (projectStatus === types_1.ProjectStatus.CONFIG_ERROR) {
+        // 配置有错误，显示配置错误界面
+        await setViewVisibility('configError');
+        configErrorProvider.setCore(core);
+        statusProvider.updateStatus(core, null);
+    }
+    else if (projectStatus === types_1.ProjectStatus.INITIALIZED) {
+        // 配置正确，显示翻译管理界面
+        await setViewVisibility('translationManager');
         await treeProvider.setCore(core);
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
     }
     else {
+        // 未知状态，默认显示翻译管理界面
+        await setViewVisibility('translationManager');
+        await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
-        treeProvider.refresh();
     }
+}
+async function setViewVisibility(view) {
+    await vscode.commands.executeCommand('setContext', 'contexto.showWelcome', view === 'welcome');
+    await vscode.commands.executeCommand('setContext', 'contexto.showConfigError', view === 'configError');
+    await vscode.commands.executeCommand('setContext', 'contexto.showTranslationManager', view === 'translationManager');
+}
+async function setWelcomeVisibility(show) {
+    await vscode.commands.executeCommand('setContext', 'contexto.showWelcome', show);
 }
 const commands = {
     initProject: vscode.commands.registerCommand('contexto.initProject', async () => {
@@ -66,32 +106,20 @@ const commands = {
         }
         try {
             await core.initializeProject();
-            await treeProvider.setCore(core);
-            const analysis = treeProvider.getAnalysis();
-            statusProvider.updateStatus(core, analysis);
+            // 重新检查项目状态
+            await initializeWorkspace();
             // 打开配置文件让用户配置
             const configPath = core.getConfigPath();
             const doc = await vscode.workspace.openTextDocument(configPath);
             await vscode.window.showTextDocument(doc);
-            vscode.window.showInformationMessage('项目初始化完成！请配置 AI 服务信息，保存后将自动扫描源字典文件。');
+            vscode.window.showInformationMessage('项目初始化完成！请配置 AI 服务信息和源语言字典路径，保存后将自动检测配置。');
         }
         catch (error) {
             vscode.window.showErrorMessage(`项目初始化失败：${error}`);
         }
     }),
     refresh: vscode.commands.registerCommand('contexto.refresh', async () => {
-        if (!core) {
-            await initializeWorkspace();
-            return;
-        }
-        try {
-            await treeProvider.updateAnalysis();
-            const analysis = treeProvider.getAnalysis();
-            statusProvider.updateStatus(core, analysis);
-        }
-        catch (error) {
-            vscode.window.showErrorMessage(`数据刷新失败：${error}`);
-        }
+        await initializeWorkspace();
     }),
     deleteKeys: vscode.commands.registerCommand('contexto.deleteKeys', async () => {
         if (!core) {

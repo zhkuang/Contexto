@@ -7,6 +7,7 @@ const path = require("path");
 const configManager_1 = require("./configManager");
 const keyAnalyzer_1 = require("./keyAnalyzer");
 const aiService_1 = require("./aiService");
+const types_1 = require("./types");
 class ContextoCore {
     constructor(workspaceRoot) {
         this.keyAnalyzer = null;
@@ -14,6 +15,8 @@ class ContextoCore {
         this.config = null;
         this.cache = {};
         this.analysis = null;
+        this.projectStatus = types_1.ProjectStatus.UNINITIALIZED;
+        this.configValidation = null;
         this.configManager = new configManager_1.ConfigManager(workspaceRoot);
     }
     /**
@@ -32,13 +35,19 @@ class ContextoCore {
             return false;
         }
         console.log('项目配置加载成功:', this.config);
+        // 验证配置
+        const configValidation = this.validateConfig();
+        if (!configValidation.isValid) {
+            console.log('配置验证失败:', configValidation.errors);
+            return false;
+        }
         // 检查AI服务配置
         if (!this.config.aiService.apiKey) {
             vscode.window.showWarningMessage('请在 config.json 中配置 AI 服务的 API 密钥后再使用翻译功能');
         }
         // 初始化服务
         this.keyAnalyzer = new keyAnalyzer_1.KeyAnalyzer(this.config, this.configManager.getWorkspaceRoot());
-        this.aiService = new aiService_1.OpenAIService(this.config.aiService);
+        this.aiService = new aiService_1.OpenAIService(this.config.aiService, this.config.contextLines || 5);
         // 加载缓存
         this.cache = await this.configManager.loadCache();
         console.log('翻译缓存初始化完成，已加载文本项数量:', Object.keys(this.cache).length);
@@ -52,6 +61,64 @@ class ContextoCore {
     async initializeProject() {
         await this.configManager.initializeProject();
         await this.initialize();
+    }
+    /**
+     * 验证配置
+     */
+    validateConfig() {
+        const errors = [];
+        const warnings = [];
+        if (!this.config) {
+            errors.push('配置文件未加载');
+            return { isValid: false, errors, warnings };
+        }
+        // 验证源语言字典文件路径
+        if (!this.config.sourceLangDict) {
+            errors.push('sourceLangDict 配置项不能为空');
+        }
+        else {
+            const sourceDictPath = path.resolve(this.configManager.getWorkspaceRoot(), this.config.sourceLangDict);
+            if (!fs.existsSync(sourceDictPath)) {
+                errors.push(`源语言字典文件不存在: ${this.config.sourceLangDict}`);
+            }
+            else {
+                // 验证是否为有效的JSON文件
+                try {
+                    const content = fs.readFileSync(sourceDictPath, 'utf-8');
+                    JSON.parse(content);
+                }
+                catch (error) {
+                    errors.push(`源语言字典文件格式错误: ${this.config.sourceLangDict} (${error})`);
+                }
+            }
+        }
+        // 验证目标语言配置
+        if (!this.config.targetLangs || this.config.targetLangs.length === 0) {
+            warnings.push('targetLangs 配置为空，将无法进行翻译');
+        }
+        // 验证AI服务配置
+        if (!this.config.aiService) {
+            warnings.push('aiService 配置缺失');
+        }
+        else {
+            if (!this.config.aiService.apiKey) {
+                warnings.push('AI 服务 API 密钥未配置');
+            }
+            if (!this.config.aiService.base) {
+                warnings.push('AI 服务 base URL 未配置');
+            }
+            if (!this.config.aiService.model) {
+                warnings.push('AI 服务模型未配置');
+            }
+        }
+        // 验证忽略规则
+        if (!this.config.ignore || this.config.ignore.length === 0) {
+            warnings.push('ignore 配置为空，可能会扫描不必要的文件');
+        }
+        const isValid = errors.length === 0;
+        this.configValidation = { isValid, errors, warnings };
+        this.projectStatus = isValid ? types_1.ProjectStatus.INITIALIZED : types_1.ProjectStatus.CONFIG_ERROR;
+        return this.configValidation;
     }
     /**
      * 刷新分析
@@ -307,6 +374,24 @@ class ContextoCore {
      */
     getConfigPath() {
         return this.configManager.getConfigPath();
+    }
+    /**
+     * 获取项目状态
+     */
+    getProjectStatus() {
+        return this.projectStatus;
+    }
+    /**
+     * 获取配置验证结果
+     */
+    getConfigValidation() {
+        return this.configValidation;
+    }
+    /**
+     * 检查配置是否有效
+     */
+    hasValidConfig() {
+        return this.projectStatus === types_1.ProjectStatus.INITIALIZED;
     }
 }
 exports.ContextoCore = ContextoCore;

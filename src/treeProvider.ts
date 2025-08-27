@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ContextoCore } from './contextoCore';
-import { KeyAnalysis, KeyStatus } from './types';
+import { KeyAnalysis, KeyStatus, ProjectStatus } from './types';
 
 // Tree item for displaying keys
 class KeyTreeItem extends vscode.TreeItem {
@@ -52,12 +52,35 @@ class IndividualKeyItem extends vscode.TreeItem {
     }
 }
 
-export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | IndividualKeyItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<KeyTreeItem | IndividualKeyItem | undefined | null | void> = new vscode.EventEmitter<KeyTreeItem | IndividualKeyItem | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<KeyTreeItem | IndividualKeyItem | undefined | null | void> = this._onDidChangeTreeData.event;
+// Welcome message item for uninitialized projects
+class WelcomeItem extends vscode.TreeItem {
+    constructor(public readonly message: string) {
+        super(message, vscode.TreeItemCollapsibleState.None);
+        this.contextValue = 'welcomeMessage';
+    }
+}
+
+// Initialize button item
+class InitializeItem extends vscode.TreeItem {
+    constructor() {
+        super('🚀 初始化 Contexto 项目', vscode.TreeItemCollapsibleState.None);
+        this.tooltip = '点击初始化 Contexto 项目，开始智能国际化翻译';
+        this.command = {
+            command: 'contexto.initProject',
+            title: '初始化项目'
+        };
+        this.iconPath = new vscode.ThemeIcon('rocket', new vscode.ThemeColor('button.background'));
+        this.contextValue = 'initializeButton';
+    }
+}
+
+export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem | undefined | null | void> = new vscode.EventEmitter<KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     private core: ContextoCore | null = null;
     private analysis: KeyAnalysis | null = null;
+    private isInitialized: boolean = false;
 
     constructor() {
         this.refresh();
@@ -67,23 +90,46 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         this._onDidChangeTreeData.fire();
     }
 
-    async setCore(core: ContextoCore): Promise<void> {
+    async setCore(core: ContextoCore | null): Promise<void> {
         this.core = core;
-        this.analysis = await core.refreshAnalysis();
+        this.isInitialized = core ? core.isInitialized() : false;
+        if (this.isInitialized && core) {
+            this.analysis = await core.refreshAnalysis();
+        } else {
+            this.analysis = null;
+        }
         this.refresh();
     }
 
-    getTreeItem(element: KeyTreeItem | IndividualKeyItem): vscode.TreeItem {
+    getTreeItem(element: KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem): vscode.TreeItem {
         return element;
     }
 
-    getChildren(element?: KeyTreeItem | IndividualKeyItem): Thenable<(KeyTreeItem | IndividualKeyItem)[]> {
-        if (!this.core) {
-            return Promise.resolve([]);
-        }
-
+    getChildren(element?: KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem): Thenable<(KeyTreeItem | IndividualKeyItem | WelcomeItem | InitializeItem)[]> {
         if (!element) {
-            // Root level - show status categories
+            // Root level
+            if (!this.core) {
+                return Promise.resolve([
+                    new WelcomeItem('请打开一个工作区文件夹以开始使用 Contexto')
+                ]);
+            }
+
+            if (!this.isInitialized) {
+                return Promise.resolve([
+                    new WelcomeItem(''),
+                    new WelcomeItem('🌍 欢迎使用 Contexto'),
+                    new WelcomeItem(''),
+                    new WelcomeItem('📝 智能国际化翻译助手'),
+                    new WelcomeItem('🎯 符合业务场景的本土化翻译'),
+                    new WelcomeItem('🤖 基于AI的智能翻译推荐'),
+                    new WelcomeItem(''),
+                    new InitializeItem(),
+                    new WelcomeItem(''),
+                    new WelcomeItem('💡 初始化后即可开始使用所有功能')
+                ]);
+            }
+
+            // Show status categories for initialized projects
             return this.getRootElements();
         }
 
@@ -202,6 +248,14 @@ export class ContextoStatusProvider {
             this.statusBarItem.text = '$(globe) Contexto: 未初始化';
             this.statusBarItem.tooltip = '点击初始化项目';
             this.statusBarItem.command = 'contexto.initProject';
+            return;
+        }
+
+        const projectStatus = core.getProjectStatus();
+        if (projectStatus === ProjectStatus.CONFIG_ERROR) {
+            this.statusBarItem.text = '$(globe) Contexto: 配置异常';
+            this.statusBarItem.tooltip = '配置文件存在错误，点击查看详情';
+            this.statusBarItem.command = 'contexto.openConfig';
             return;
         }
 

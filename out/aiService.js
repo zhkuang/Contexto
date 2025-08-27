@@ -4,8 +4,9 @@ exports.OpenAIService = void 0;
 const axios_1 = require("axios");
 const logger_1 = require("./logger");
 class OpenAIService {
-    constructor(config) {
+    constructor(config, contextLines = 5) {
         this.config = config;
+        this.contextLines = contextLines;
         this.logger = logger_1.Logger.getInstance();
     }
     /**
@@ -142,9 +143,9 @@ UI场景：[具体描述文本在用户界面中的展示位置、交互场景�
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (line.includes(key)) {
-                // 提取前后各3行作为上下文
-                const startIndex = Math.max(0, i - 3);
-                const endIndex = Math.min(lines.length - 1, i + 3);
+                // 提取前后各contextLines行作为上下文
+                const startIndex = Math.max(0, i - this.contextLines);
+                const endIndex = Math.min(lines.length - 1, i + this.contextLines);
                 for (let j = startIndex; j <= endIndex; j++) {
                     if (!relevantLines.includes(lines[j])) {
                         relevantLines.push(lines[j]);

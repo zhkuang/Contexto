@@ -26,9 +26,23 @@
     "views": {
       "contexto": [
         {
+          "id": "contexto.welcome",
+          "name": "欢迎",
+          "type": "webview",
+          "when": "contexto.showWelcome",
+          "icon": "$(rocket)"
+        },
+        {
+          "id": "contexto.configError",
+          "name": "配置异常",
+          "type": "webview",
+          "when": "contexto.showConfigError",
+          "icon": "$(warning)"
+        },
+        {
           "id": "contexto",
           "name": "翻译管理",
-          "when": "true",
+          "when": "contexto.showTranslationManager",
           "icon": "$(list-unordered)"
         }
       ]

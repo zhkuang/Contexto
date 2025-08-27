@@ -46,12 +46,34 @@ class IndividualKeyItem extends vscode.TreeItem {
         this.contextValue = 'contextKey';
     }
 }
+// Welcome message item for uninitialized projects
+class WelcomeItem extends vscode.TreeItem {
+    constructor(message) {
+        super(message, vscode.TreeItemCollapsibleState.None);
+        this.message = message;
+        this.contextValue = 'welcomeMessage';
+    }
+}
+// Initialize button item
+class InitializeItem extends vscode.TreeItem {
+    constructor() {
+        super('🚀 初始化 Contexto 项目', vscode.TreeItemCollapsibleState.None);
+        this.tooltip = '点击初始化 Contexto 项目，开始智能国际化翻译';
+        this.command = {
+            command: 'contexto.initProject',
+            title: '初始化项目'
+        };
+        this.iconPath = new vscode.ThemeIcon('rocket', new vscode.ThemeColor('button.background'));
+        this.contextValue = 'initializeButton';
+    }
+}
 class ContextoProvider {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
         this.core = null;
         this.analysis = null;
+        this.isInitialized = false;
         this.refresh();
     }
     refresh() {
@@ -59,18 +81,41 @@ class ContextoProvider {
     }
     async setCore(core) {
         this.core = core;
-        this.analysis = await core.refreshAnalysis();
+        this.isInitialized = core ? core.isInitialized() : false;
+        if (this.isInitialized && core) {
+            this.analysis = await core.refreshAnalysis();
+        }
+        else {
+            this.analysis = null;
+        }
         this.refresh();
     }
     getTreeItem(element) {
         return element;
     }
     getChildren(element) {
-        if (!this.core) {
-            return Promise.resolve([]);
-        }
         if (!element) {
-            // Root level - show status categories
+            // Root level
+            if (!this.core) {
+                return Promise.resolve([
+                    new WelcomeItem('请打开一个工作区文件夹以开始使用 Contexto')
+                ]);
+            }
+            if (!this.isInitialized) {
+                return Promise.resolve([
+                    new WelcomeItem(''),
+                    new WelcomeItem('🌍 欢迎使用 Contexto'),
+                    new WelcomeItem(''),
+                    new WelcomeItem('📝 智能国际化翻译助手'),
+                    new WelcomeItem('🎯 符合业务场景的本土化翻译'),
+                    new WelcomeItem('🤖 基于AI的智能翻译推荐'),
+                    new WelcomeItem(''),
+                    new InitializeItem(),
+                    new WelcomeItem(''),
+                    new WelcomeItem('💡 初始化后即可开始使用所有功能')
+                ]);
+            }
+            // Show status categories for initialized projects
             return this.getRootElements();
         }
         if (element instanceof KeyTreeItem && element.status) {
@@ -151,6 +196,13 @@ class ContextoStatusProvider {
             this.statusBarItem.text = '$(globe) Contexto: 未初始化';
             this.statusBarItem.tooltip = '点击初始化项目';
             this.statusBarItem.command = 'contexto.initProject';
+            return;
+        }
+        const projectStatus = core.getProjectStatus();
+        if (projectStatus === types_1.ProjectStatus.CONFIG_ERROR) {
+            this.statusBarItem.text = '$(globe) Contexto: 配置异常';
+            this.statusBarItem.tooltip = '配置文件存在错误，点击查看详情';
+            this.statusBarItem.command = 'contexto.openConfig';
             return;
         }
         if (!analysis) {

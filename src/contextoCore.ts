@@ -4,7 +4,7 @@ import * as path from 'path';
 import { ConfigManager } from './configManager';
 import { KeyAnalyzer } from './keyAnalyzer';
 import { OpenAIService } from './aiService';
-import { ContextoConfig, I18nCache, KeyAnalysis, TranslationTask, TranslationItem } from './types';
+import { ContextoConfig, I18nCache, KeyAnalysis, TranslationTask, TranslationItem, ConfigValidation, ProjectStatus } from './types';
 
 export class ContextoCore {
     private configManager: ConfigManager;
@@ -13,6 +13,8 @@ export class ContextoCore {
     private config: ContextoConfig | null = null;
     private cache: I18nCache = {};
     private analysis: KeyAnalysis | null = null;
+    private projectStatus: ProjectStatus = ProjectStatus.UNINITIALIZED;
+    private configValidation: ConfigValidation | null = null;
 
     constructor(workspaceRoot: string) {
         this.configManager = new ConfigManager(workspaceRoot);
@@ -35,6 +37,13 @@ export class ContextoCore {
             return false;
         }
         console.log('项目配置加载成功:', this.config);
+
+        // 验证配置
+        const configValidation = this.validateConfig();
+        if (!configValidation.isValid) {
+            console.log('配置验证失败:', configValidation.errors);
+            return false;
+        }
 
         // 检查AI服务配置
         if (!this.config.aiService.apiKey) {
@@ -61,6 +70,68 @@ export class ContextoCore {
     async initializeProject(): Promise<void> {
         await this.configManager.initializeProject();
         await this.initialize();
+    }
+
+    /**
+     * 验证配置
+     */
+    private validateConfig(): ConfigValidation {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+
+        if (!this.config) {
+            errors.push('配置文件未加载');
+            return { isValid: false, errors, warnings };
+        }
+
+        // 验证源语言字典文件路径
+        if (!this.config.sourceLangDict) {
+            errors.push('sourceLangDict 配置项不能为空');
+        } else {
+            const sourceDictPath = path.resolve(this.configManager.getWorkspaceRoot(), this.config.sourceLangDict);
+            if (!fs.existsSync(sourceDictPath)) {
+                errors.push(`源语言字典文件不存在: ${this.config.sourceLangDict}`);
+            } else {
+                // 验证是否为有效的JSON文件
+                try {
+                    const content = fs.readFileSync(sourceDictPath, 'utf-8');
+                    JSON.parse(content);
+                } catch (error) {
+                    errors.push(`源语言字典文件格式错误: ${this.config.sourceLangDict} (${error})`);
+                }
+            }
+        }
+
+        // 验证目标语言配置
+        if (!this.config.targetLangs || this.config.targetLangs.length === 0) {
+            warnings.push('targetLangs 配置为空，将无法进行翻译');
+        }
+
+        // 验证AI服务配置
+        if (!this.config.aiService) {
+            warnings.push('aiService 配置缺失');
+        } else {
+            if (!this.config.aiService.apiKey) {
+                warnings.push('AI 服务 API 密钥未配置');
+            }
+            if (!this.config.aiService.base) {
+                warnings.push('AI 服务 base URL 未配置');
+            }
+            if (!this.config.aiService.model) {
+                warnings.push('AI 服务模型未配置');
+            }
+        }
+
+        // 验证忽略规则
+        if (!this.config.ignore || this.config.ignore.length === 0) {
+            warnings.push('ignore 配置为空，可能会扫描不必要的文件');
+        }
+
+        const isValid = errors.length === 0;
+        this.configValidation = { isValid, errors, warnings };
+        this.projectStatus = isValid ? ProjectStatus.INITIALIZED : ProjectStatus.CONFIG_ERROR;
+
+        return this.configValidation;
     }
 
     /**
@@ -362,5 +433,26 @@ export class ContextoCore {
      */
     getConfigPath(): string {
         return this.configManager.getConfigPath();
+    }
+
+    /**
+     * 获取项目状态
+     */
+    getProjectStatus(): ProjectStatus {
+        return this.projectStatus;
+    }
+
+    /**
+     * 获取配置验证结果
+     */
+    getConfigValidation(): ConfigValidation | null {
+        return this.configValidation;
+    }
+
+    /**
+     * 检查配置是否有效
+     */
+    hasValidConfig(): boolean {
+        return this.projectStatus === ProjectStatus.INITIALIZED;
     }
 }

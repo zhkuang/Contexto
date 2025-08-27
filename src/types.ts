@@ -49,6 +49,20 @@ export interface ScanResult {
     [key: string]: string; // key -> source text
 }
 
+// 配置验证结果
+export interface ConfigValidation {
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+}
+
+// 项目状态
+export enum ProjectStatus {
+    UNINITIALIZED = 'uninitialized',
+    CONFIG_ERROR = 'config_error',
+    INITIALIZED = 'initialized'
+}
+
 // 支持的字典格式
 export interface DictParser {
     canParse(filePath: string): boolean;
