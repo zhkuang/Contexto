@@ -44,6 +44,13 @@
           "name": "翻译管理",
           "when": "contexto.showTranslationManager",
           "icon": "$(list-unordered)"
+        },
+        {
+          "id": "contexto.stats",
+          "name": "统计数据",
+          "type": "webview",
+          "when": "contexto.showTranslationManager",
+          "icon": "$(graph)"
         }
       ]
     },

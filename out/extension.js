@@ -6,6 +6,7 @@ const contextoCore_1 = require("./contextoCore");
 const treeProvider_1 = require("./treeProvider");
 const welcomeWebview_1 = require("./welcomeWebview");
 const configErrorWebview_1 = require("./configErrorWebview");
+const statsWebviewProvider_1 = require("./statsWebviewProvider");
 const types_1 = require("./types");
 const logger_1 = require("./logger");
 let core = null;
@@ -13,6 +14,7 @@ let treeProvider;
 let statusProvider;
 let welcomeProvider;
 let configErrorProvider;
+let statsProvider;
 function activate(context) {
     console.log('Contexto插件已激活');
     // 初始化providers
@@ -20,6 +22,7 @@ function activate(context) {
     statusProvider = new treeProvider_1.ContextoStatusProvider();
     welcomeProvider = new welcomeWebview_1.WelcomeWebviewProvider(context.extensionUri);
     configErrorProvider = new configErrorWebview_1.ConfigErrorWebviewProvider(context.extensionUri);
+    statsProvider = new statsWebviewProvider_1.StatsWebviewProvider(context.extensionUri);
     // 注册tree view
     const treeView = vscode.window.createTreeView('contexto', {
         treeDataProvider: treeProvider,
@@ -29,6 +32,8 @@ function activate(context) {
     const welcomeView = vscode.window.registerWebviewViewProvider(welcomeWebview_1.WelcomeWebviewProvider.viewType, welcomeProvider);
     // 注册config error webview
     const configErrorView = vscode.window.registerWebviewViewProvider(configErrorWebview_1.ConfigErrorWebviewProvider.viewType, configErrorProvider);
+    // 注册stats webview
+    const statsView = vscode.window.registerWebviewViewProvider(statsWebviewProvider_1.StatsWebviewProvider.viewType, statsProvider);
     // 检查工作区并初始化
     initializeWorkspace();
     // 注册命令
@@ -45,7 +50,7 @@ function activate(context) {
         }
     });
     // 添加到订阅列表
-    context.subscriptions.push(treeView, welcomeView, configErrorView, statusProvider, ...Object.values(commands));
+    context.subscriptions.push(treeView, welcomeView, configErrorView, statsView, statusProvider, ...Object.values(commands));
 }
 exports.activate = activate;
 async function initializeWorkspace() {
@@ -55,6 +60,7 @@ async function initializeWorkspace() {
         await setViewVisibility('none');
         statusProvider.updateStatus(null, null);
         await treeProvider.setCore(null);
+        statsProvider.setCore(null);
         return;
     }
     const workspaceRoot = workspaceFolders[0].uri.fsPath;
@@ -65,6 +71,7 @@ async function initializeWorkspace() {
         welcomeProvider.setCore(core);
         await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
         return;
     }
     // 项目已初始化，尝试加载配置
@@ -75,6 +82,7 @@ async function initializeWorkspace() {
         await setViewVisibility('configError');
         configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
     }
     else if (projectStatus === types_1.ProjectStatus.INITIALIZED) {
         // 配置正确，显示翻译管理界面
@@ -82,12 +90,14 @@ async function initializeWorkspace() {
         await treeProvider.setCore(core);
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
+        statsProvider.setCore(core);
     }
     else {
         // 未知状态，默认显示翻译管理界面
         await setViewVisibility('translationManager');
         await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
     }
 }
 async function setViewVisibility(view) {

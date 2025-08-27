@@ -3,6 +3,7 @@ import { ContextoCore } from './contextoCore';
 import { ContextoProvider, ContextoStatusProvider } from './treeProvider';
 import { WelcomeWebviewProvider } from './welcomeWebview';
 import { ConfigErrorWebviewProvider } from './configErrorWebview';
+import { StatsWebviewProvider } from './statsWebviewProvider';
 import { ProjectStatus } from './types';
 import { Logger } from './logger';
 
@@ -11,6 +12,7 @@ let treeProvider: ContextoProvider;
 let statusProvider: ContextoStatusProvider;
 let welcomeProvider: WelcomeWebviewProvider;
 let configErrorProvider: ConfigErrorWebviewProvider;
+let statsProvider: StatsWebviewProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Contexto插件已激活');
@@ -20,6 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
     statusProvider = new ContextoStatusProvider();
     welcomeProvider = new WelcomeWebviewProvider(context.extensionUri);
     configErrorProvider = new ConfigErrorWebviewProvider(context.extensionUri);
+    statsProvider = new StatsWebviewProvider(context.extensionUri);
 
     // 注册tree view
     const treeView = vscode.window.createTreeView('contexto', {
@@ -37,6 +40,12 @@ export function activate(context: vscode.ExtensionContext) {
     const configErrorView = vscode.window.registerWebviewViewProvider(
         ConfigErrorWebviewProvider.viewType,
         configErrorProvider
+    );
+
+    // 注册stats webview
+    const statsView = vscode.window.registerWebviewViewProvider(
+        StatsWebviewProvider.viewType,
+        statsProvider
     );
 
     // 检查工作区并初始化
@@ -63,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
         treeView,
         welcomeView,
         configErrorView,
+        statsView,
         statusProvider,
         ...Object.values(commands)
     );
@@ -76,6 +86,7 @@ async function initializeWorkspace() {
         await setViewVisibility('none');
         statusProvider.updateStatus(null, null);
         await treeProvider.setCore(null);
+        statsProvider.setCore(null);
         return;
     }
 
@@ -88,6 +99,7 @@ async function initializeWorkspace() {
         welcomeProvider.setCore(core);
         await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
         return;
     }
 
@@ -100,17 +112,20 @@ async function initializeWorkspace() {
         await setViewVisibility('configError');
         configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
     } else if (projectStatus === ProjectStatus.INITIALIZED) {
         // 配置正确，显示翻译管理界面
         await setViewVisibility('translationManager');
         await treeProvider.setCore(core);
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
+        statsProvider.setCore(core);
     } else {
         // 未知状态，默认显示翻译管理界面
         await setViewVisibility('translationManager');
         await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
+        statsProvider.setCore(core);
     }
 }
 

@@ -218,7 +218,7 @@ class ContextoStatusProvider {
         }
         else {
             this.statusBarItem.text = `$(globe) Contexto: ${totalKeys}个待处理`;
-            this.statusBarItem.tooltip = `新增: ${analysis.newKeys.length}, 更新: ${analysis.updatedKeys.length}, 待翻译: ${analysis.pendingKeys.length}, 无用: ${analysis.obsoleteKeys.length}`;
+            this.statusBarItem.tooltip = `新增: ${analysis.newKeys.length}, 更新: ${analysis.updatedKeys.length}, 待翻译: ${analysis.pendingKeys.length}, 未使用: ${analysis.obsoleteKeys.length}`;
         }
         this.statusBarItem.command = 'contexto.refresh';
     }

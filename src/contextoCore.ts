@@ -446,4 +446,18 @@ export class ContextoCore {
     hasValidConfig(): boolean {
         return this.projectStatus === ProjectStatus.INITIALIZED;
     }
+
+    /**
+     * 获取缓存数据
+     */
+    getCache(): I18nCache {
+        return this.cache;
+    }
+
+    /**
+     * 获取工作区根目录
+     */
+    getWorkspaceRoot(): string {
+        return this.configManager.getWorkspaceRoot();
+    }
 }
