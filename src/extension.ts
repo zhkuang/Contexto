@@ -150,7 +150,35 @@ const commands = {
     }),
 
     refresh: vscode.commands.registerCommand('contexto.refresh', async () => {
-        await initializeWorkspace();
+        console.log('执行刷新命令...');
+        
+        if (!core) {
+            console.log('core不存在，重新初始化工作区');
+            await initializeWorkspace();
+            return;
+        }
+        
+        if (!core.isInitialized()) {
+            console.log('项目未初始化，重新初始化工作区');
+            await initializeWorkspace();
+            return;
+        }
+        
+        try {
+            console.log('开始刷新分析数据...');
+            // 重新分析键值
+            await treeProvider.updateAnalysis();
+            
+            // 更新状态栏
+            const analysis = treeProvider.getAnalysis();
+            statusProvider.updateStatus(core, analysis);
+            
+            console.log('刷新完成');
+            vscode.window.showInformationMessage('Contexto: 刷新完成');
+        } catch (error) {
+            console.error('刷新失败:', error);
+            vscode.window.showErrorMessage(`刷新失败：${error}`);
+        }
     }),
 
     deleteKeys: vscode.commands.registerCommand('contexto.deleteKeys', async () => {
