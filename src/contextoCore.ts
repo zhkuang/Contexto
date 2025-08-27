@@ -43,7 +43,7 @@ export class ContextoCore {
 
         // 初始化服务
         this.keyAnalyzer = new KeyAnalyzer(this.config, this.configManager.getWorkspaceRoot());
-        this.aiService = new OpenAIService(this.config.aiService);
+        this.aiService = new OpenAIService(this.config.aiService, this.config.contextLines || 5);
 
         // 加载缓存
         this.cache = await this.configManager.loadCache();

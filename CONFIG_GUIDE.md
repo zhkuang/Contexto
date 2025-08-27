@@ -12,6 +12,7 @@
     "sourceLangDict": "./locales/zh-CN.json",
     "targetLangs": ["en", "ja", "ko"],
     "ignore": ["./contexto", "./node_modules", "./.git"],
+    "contextLines": 5,
     "aiService": {
         "type": "openai",
         "apiKey": "your-api-key-here",
@@ -29,6 +30,18 @@
    - `"./src/i18n/zh.json"` - src/i18n目录下的文件
    - `"./public/locales/zh-CN.json"` - public/locales目录下的文件
    - `"./assets/i18n/zh-CN.json"` - assets/i18n目录下的文件
+
+### 配置项说明
+
+#### contextLines (可选)
+- **类型**: 数字
+- **默认值**: 5
+- **说明**: AI分析文本上下文时提取的代码行数
+- **示例**: `"contextLines": 5` 表示提取key所在行前后各5行代码
+- **建议**: 
+  - 较小值(3-5)：适合简单项目，提取速度快
+  - 较大值(7-10)：适合复杂项目，上下文更丰富
+  - 不建议超过10行，会影响AI分析效率
 
 ### 项目结构示例
 

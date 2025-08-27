@@ -31,6 +31,7 @@
     "sourceLangDict": "./locales/zh-CN.json",
     "targetLangs": ["en", "ja", "ko"],
     "ignore": ["./contexto", "./node_modules"],
+    "contextLines": 5,
     "aiService": {
         "type": "openai",
         "apiKey": "sk-your-openai-api-key",
@@ -66,6 +67,13 @@
 
 ### ignore
 忽略扫描的目录和文件列表，支持glob模式。
+
+### contextLines
+上下文代码行数配置（可选）：
+- **默认值**: 5
+- **作用**: AI分析文本时提取key所在位置前后的代码行数
+- **建议值**: 3-10行
+- **示例**: `"contextLines": 7` 会提取key前后各7行代码
 
 ### aiService
 AI服务配置：

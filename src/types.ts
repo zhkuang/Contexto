@@ -5,6 +5,7 @@ export interface ContextoConfig {
     sourceLangDict: string;
     targetLangs: string[];
     ignore: string[];
+    contextLines?: number; // 上下文提取行数，默认5行
     aiService: {
         type: string;
         apiKey: string;

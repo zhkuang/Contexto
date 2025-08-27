@@ -53,6 +53,7 @@ Contexto是一个VSCode插件，旨在帮助开发者在软件国际化过程中
     "sourceLangDict": "./locales/zh-CN.json",
     "targetLangs": ["en", "ja", "ko"],
     "ignore": ["./contexto", "./node_modules"],
+    "contextLines": 5,
     "aiService": {
         "type": "openai",
         "apiKey": "your-api-key",
