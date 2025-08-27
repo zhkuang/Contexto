@@ -28,7 +28,8 @@
         "passwords_not_match": "两次密码输入不一致"
     },
     "messages": {
-        "welcome": "欢迎使用我们的应用",
+        "app": "插件",
+        "welcome": "欢迎使用我们的插件",
         "goodbye": "感谢您的使用，再见！",
         "data_saved": "数据已保存",
         "confirm_delete": "确定要删除这个项目吗？",

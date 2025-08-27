@@ -335,7 +335,7 @@ export class ContextoWebviewProvider implements vscode.WebviewViewProvider {
                 ${analysis.obsoleteKeys.length > 0 ? `
                 <div class="status-card">
                     <div class="status-title">
-                        <span>🗑️ 无用Key</span>
+                        <span>🗑️ 未使用Key</span>
                         <span class="status-count">${analysis.obsoleteKeys.length}</span>
                     </div>
                 </div>
@@ -352,7 +352,7 @@ export class ContextoWebviewProvider implements vscode.WebviewViewProvider {
                     ${analysis.obsoleteKeys.length > 0 ? `
                     <button class="button danger" onclick="deleteKeys()">
                         <span class="icon">🗑️</span>
-                        删除无用Key
+                        删除未使用Key
                     </button>
                     ` : ''}
                     

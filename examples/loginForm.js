@@ -66,6 +66,7 @@ export class LoginForm {
         setTimeout(() => {
             this.hideLoading();
             alert(t('messages.welcome'));
+            console.log(t('messages.app'));
         }, 2000);
     }
     

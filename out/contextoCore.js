@@ -72,24 +72,24 @@ class ContextoCore {
         return this.analysis;
     }
     /**
-     * 删除无用的Key
+     * 删除未使用的Key
      */
     async deleteObsoleteKeys() {
         if (!this.analysis) {
             await this.refreshAnalysis();
         }
         if (!this.analysis || this.analysis.obsoleteKeys.length === 0) {
-            vscode.window.showInformationMessage('没有需要删除的无用Key');
+            vscode.window.showInformationMessage('没有需要删除的未使用Key');
             return;
         }
-        const result = await vscode.window.showInformationMessage(`确定要删除 ${this.analysis.obsoleteKeys.length} 个无用的Key吗？`, '删除', '取消');
+        const result = await vscode.window.showInformationMessage(`确定要删除 ${this.analysis.obsoleteKeys.length} 个未使用的Key吗？`, '删除', '取消');
         if (result === '删除') {
             for (const key of this.analysis.obsoleteKeys) {
                 delete this.cache[key];
             }
             await this.configManager.saveCache(this.cache);
             await this.refreshAnalysis();
-            vscode.window.showInformationMessage(`已删除 ${this.analysis.obsoleteKeys.length} 个无用的Key`);
+            vscode.window.showInformationMessage(`已删除 ${this.analysis.obsoleteKeys.length} 个未使用的Key`);
         }
     }
     /**

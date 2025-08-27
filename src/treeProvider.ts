@@ -135,7 +135,7 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         // Obsolete keys
         if (this.analysis.obsoleteKeys.length > 0) {
             elements.push(new KeyTreeItem(
-                '无用Key',
+                '未使用Key',
                 vscode.TreeItemCollapsibleState.Collapsed,
                 KeyStatus.OBSOLETE,
                 this.analysis.obsoleteKeys.length

@@ -98,7 +98,7 @@ class ContextoProvider {
         }
         // Obsolete keys
         if (this.analysis.obsoleteKeys.length > 0) {
-            elements.push(new KeyTreeItem('无用Key', vscode.TreeItemCollapsibleState.Collapsed, types_1.KeyStatus.OBSOLETE, this.analysis.obsoleteKeys.length));
+            elements.push(new KeyTreeItem('未使用Key', vscode.TreeItemCollapsibleState.Collapsed, types_1.KeyStatus.OBSOLETE, this.analysis.obsoleteKeys.length));
         }
         return elements;
     }

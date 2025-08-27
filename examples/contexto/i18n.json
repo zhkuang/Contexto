@@ -72,10 +72,6 @@
     "messages.goodbye": {
         "source": "感谢您的使用，再见！",
         "sourceFile": "loginForm.js",
-        "translations": {
-            "en": "Thank you for using our service. Goodbye!",
-            "ja": "ご利用ありがとうございました。さようなら！"
-        },
         "businessContext": "该文本用于提示用户确认退出操作，表达对用户使用产品的感谢，增强用户体验并礼貌结束会话。",
         "uiContext": "在登录表单页面，当用户点击取消或关闭按钮时弹出确认对话框，文本内容“感谢您的使用，再见！”作为确认提示信息展示，用户需确认是否关闭窗口。"
     }

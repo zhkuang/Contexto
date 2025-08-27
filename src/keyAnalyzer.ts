@@ -40,34 +40,78 @@ export class KeyAnalyzer {
         const sourceKeys = new Set(Object.keys(sourceDict));
         const cacheKeys = new Set(Object.keys(cache));
 
-        // 新增的key
-        const newKeys = Array.from(sourceKeys).filter(key => !cacheKeys.has(key));
+        console.log(`Key分析开始: 源字典 ${sourceKeys.size} 个key, 缓存 ${cacheKeys.size} 个key`);
+        console.log(`目标语言: ${this.config.targetLangs.join(', ')}`);
 
-        // 需要删除的key
-        const obsoleteKeys = Array.from(cacheKeys).filter(key => !sourceKeys.has(key));
+        // 第一步：找出在源字典中但项目中未被使用的key
+        const unusedInProject: string[] = [];
+        for (const key of sourceKeys) {
+            const referencingFiles = await this.searchKeyInFiles(key);
+            if (referencingFiles.length === 0) {
+                unusedInProject.push(key);
+            }
+        }
+        const unusedInProjectSet = new Set(unusedInProject);
+        console.log(`项目中未使用的key: ${unusedInProject.length} 个`);
 
-        // 更新的key（源文本发生变化）
+        // 第二步：分类处理各种key状态（确保互斥）
+        const newKeys: string[] = [];
         const updatedKeys: string[] = [];
+        const pendingKeys: string[] = [];
+        const obsoleteKeys: string[] = [];
+
+        // 处理源字典中的每个key
         for (const key of sourceKeys) {
-            if (cacheKeys.has(key) && cache[key].source !== sourceDict[key]) {
+            // 如果key在项目中未被使用，直接归类为未使用key
+            if (unusedInProjectSet.has(key)) {
+                obsoleteKeys.push(key);
+                continue;
+            }
+
+            // key在项目中有使用，进一步分类
+            if (!cacheKeys.has(key)) {
+                // 新增key：源字典中新出现且在项目中有引用的key
+                newKeys.push(key);
+            } else if (cache[key].source !== sourceDict[key]) {
+                // 更新key：源文本发生变化的key
                 updatedKeys.push(key);
+            } else {
+                // 检查是否为待翻译key：缓存中有数据但目标语言翻译不完整
+                const cacheItem = cache[key];
+                const translations = cacheItem.translations || {};
+                
+                console.log(`检查key "${key}" 的翻译状态:`, {
+                    hasTranslationsField: cacheItem.hasOwnProperty('translations'),
+                    hasTranslations: !!cacheItem.translations,
+                    translationsKeys: Object.keys(translations),
+                    targetLangs: this.config.targetLangs,
+                    translationsCount: Object.keys(translations).length
+                });
+                
+                const missingTargetLangs = this.config.targetLangs.filter(
+                    targetLang => !translations[targetLang] || translations[targetLang].trim() === ''
+                );
+                
+                if (missingTargetLangs.length > 0) {
+                    console.log(`key "${key}" 缺少翻译的语言:`, missingTargetLangs);
+                    pendingKeys.push(key);
+                } else {
+                    console.log(`key "${key}" 翻译完整`);
+                }
+                // 如果翻译完整，则不需要处理（状态正常）
             }
         }
 
-        // 待翻译的key
-        const pendingKeys: string[] = [];
-        for (const key of sourceKeys) {
-            if (cacheKeys.has(key)) {
-                const translations = cache[key].translations;
-                for (const targetLang of this.config.targetLangs) {
-                    if (!translations[targetLang] || translations[targetLang].trim() === '') {
-                        if (!pendingKeys.includes(key)) {
-                            pendingKeys.push(key);
-                        }
-                    }
-                }
-            }
-        }
+        // 处理缓存中存在但源字典中不存在的key（已删除的key）
+        const deletedFromSource = Array.from(cacheKeys).filter(key => !sourceKeys.has(key));
+        obsoleteKeys.push(...deletedFromSource);
+
+        console.log(`Key分析结果:`, {
+            newKeys: newKeys.length,
+            updatedKeys: updatedKeys.length,
+            pendingKeys: pendingKeys.length,
+            obsoleteKeys: obsoleteKeys.length
+        });
 
         return {
             newKeys,
