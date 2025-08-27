@@ -139,19 +139,10 @@ export class ContextoCore {
      */
     async refreshAnalysis(): Promise<KeyAnalysis | null> {
         if (!this.keyAnalyzer) {
-            console.log('文本分析器未初始化，无法执行分析');
             return null;
         }
 
-        console.log('正在执行文本项分析...');
         this.analysis = await this.keyAnalyzer.analyzeKeys(this.cache);
-        console.log('文本项分析完成:', {
-            新增: this.analysis.newKeys.length,
-            更新: this.analysis.updatedKeys.length,
-            待翻译: this.analysis.pendingKeys.length,
-            无用: this.analysis.obsoleteKeys.length
-        });
-        
         return this.analysis;
     }
 
