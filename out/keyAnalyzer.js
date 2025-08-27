@@ -79,6 +79,10 @@ class KeyAnalyzer {
                     targetLangs: this.config.targetLangs,
                     translationsCount: Object.keys(translations).length
                 });
+                // 确保 translations 字段存在
+                if (!cacheItem.translations) {
+                    cacheItem.translations = {};
+                }
                 const missingTargetLangs = this.config.targetLangs.filter(targetLang => !translations[targetLang] || translations[targetLang].trim() === '');
                 if (missingTargetLangs.length > 0) {
                     console.log(`key "${key}" 缺少翻译的语言:`, missingTargetLangs);

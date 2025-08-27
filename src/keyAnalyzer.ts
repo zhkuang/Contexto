@@ -88,6 +88,11 @@ export class KeyAnalyzer {
                     translationsCount: Object.keys(translations).length
                 });
                 
+                // 确保 translations 字段存在
+                if (!cacheItem.translations) {
+                    cacheItem.translations = {};
+                }
+                
                 const missingTargetLangs = this.config.targetLangs.filter(
                     targetLang => !translations[targetLang] || translations[targetLang].trim() === ''
                 );

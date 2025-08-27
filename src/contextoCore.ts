@@ -240,6 +240,12 @@ export class ContextoCore {
             if (!this.cache[key]) continue;
 
             const item = this.cache[key];
+            
+            // 确保 translations 字段存在
+            if (!item.translations) {
+                item.translations = {};
+            }
+            
             for (const targetLang of this.config.targetLangs) {
                 if (!item.translations[targetLang] || item.translations[targetLang].trim() === '') {
                     tasks.push({
@@ -262,6 +268,10 @@ export class ContextoCore {
         for (const [resultKey, translation] of Object.entries(results)) {
             const [key, targetLang] = resultKey.split('_');
             if (this.cache[key] && translation.trim()) {
+                // 确保 translations 字段存在
+                if (!this.cache[key].translations) {
+                    this.cache[key].translations = {};
+                }
                 this.cache[key].translations[targetLang] = translation;
             }
         }

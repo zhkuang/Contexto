@@ -82,7 +82,14 @@ class ConfigManager {
         }
         try {
             const content = fs.readFileSync(this.cachePath, 'utf-8');
-            return JSON.parse(content);
+            const cache = JSON.parse(content);
+            // 确保每个缓存项都有 translations 字段（兼容旧版本）
+            for (const key in cache) {
+                if (!cache[key].translations) {
+                    cache[key].translations = {};
+                }
+            }
+            return cache;
         }
         catch (error) {
             vscode.window.showErrorMessage(`加载翻译缓存失败: ${error}`);
