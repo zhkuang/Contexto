@@ -1,0 +1,37 @@
+{
+    "common": {
+        "ok": "确定",
+        "cancel": "取消",
+        "save": "保存",
+        "delete": "删除",
+        "edit": "编辑",
+        "add": "添加",
+        "search": "搜索",
+        "loading": "加载中...",
+        "error": "错误",
+        "success": "成功"
+    },
+    "user": {
+        "login": "登录",
+        "logout": "退出登录",
+        "register": "注册",
+        "profile": "个人资料",
+        "settings": "设置",
+        "username": "用户名",
+        "password": "密码",
+        "email": "邮箱"
+    },
+    "validation": {
+        "required": "此字段为必填项",
+        "email_invalid": "邮箱格式不正确",
+        "password_too_short": "密码长度至少8位",
+        "passwords_not_match": "两次密码输入不一致"
+    },
+    "messages": {
+        "welcome": "欢迎使用我们的应用",
+        "goodbye": "感谢您的使用，再见！",
+        "data_saved": "数据已保存",
+        "confirm_delete": "确定要删除这个项目吗？",
+        "operation_failed": "操作失败，请重试"
+    }
+}

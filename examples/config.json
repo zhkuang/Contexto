@@ -1,0 +1,21 @@
+{
+    "sourceLangDict": "./examples/zh-CN.json",
+    "targetLangs": [
+        "en",
+        "ja",
+        "ko"
+    ],
+    "ignore": [
+        "./contexto",
+        "./node_modules",
+        "./.git",
+        "./out",
+        "./.vscode"
+    ],
+    "aiService": {
+        "type": "openai",
+        "apiKey": "",
+        "base": "https://api.openai.com/v1",
+        "model": "gpt-4"
+    }
+}

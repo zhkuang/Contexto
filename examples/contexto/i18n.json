@@ -1,0 +1,82 @@
+{
+    "common.cancel": {
+        "source": "取消",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Cancel",
+            "ja": "キャンセル"
+        },
+        "businessContext": "该文本用于登录表单中的取消操作，允许用户放弃当前输入或操作，返回到之前的状态或关闭表单，避免误提交或继续操作。",
+        "uiContext": "该文本显示在登录表单中的“取消”按钮上，通常位于表单的操作按钮区域，用户点击后触发取消事件，如关闭表单或清空输入内容。"
+    },
+    "common.loading": {
+        "source": "加载中...",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Loading...",
+            "ja": "読み込み中..."
+        },
+        "businessContext": "该文本用于提示用户当前系统正在进行某个操作（如数据请求或页面加载），以告知用户需要等待，避免重复操作或误解系统状态。",
+        "uiContext": "文本“加载中...”以浮层形式显示在页面中央或显著位置，通常在用户提交登录表单后或页面加载过程中弹出，提示用户等待操作完成。"
+    },
+    "user.login": {
+        "source": "登录",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Log In",
+            "ja": "ログイン"
+        },
+        "businessContext": "该文本用于表示用户身份验证流程中的操作按钮，触发提交用户凭证以完成登录验证的业务功能。",
+        "uiContext": "该文本作为登录按钮的显示文字，位于登录表单中，用户填写账号密码后点击此按钮提交表单进行登录操作。"
+    },
+    "user.username": {
+        "source": "用户名",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Username",
+            "ja": "ユーザー名"
+        },
+        "businessContext": "该文本用于标识用户登录时输入的账户标识字段，表示用户需要填写其唯一的用户名以进行身份验证。",
+        "uiContext": "该文本作为用户名输入框的标签显示在登录表单中，通常位于输入框左侧或上方，提示用户在该输入框中输入其用户名，交互时机为用户访问登录页面或弹出登录窗口时。"
+    },
+    "user.password": {
+        "source": "密码",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Password",
+            "ja": "パスワード"
+        },
+        "businessContext": "该文本用于标识用户登录流程中的密码输入字段，提示用户输入其账户对应的密码以完成身份验证。",
+        "uiContext": "该文本作为密码输入框的标签显示在登录表单中，通常位于密码输入框的左侧或上方，用户在填写登录信息时看到并识别需要输入密码的输入框。"
+    },
+    "validation.required": {
+        "source": "此字段为必填项",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "This field is required",
+            "ja": "この項目は必須です"
+        },
+        "businessContext": "该文本用于表明用户在提交登录表单时，必须填写对应的输入字段（如用户名），否则表单验证不通过，阻止提交，确保关键数据完整性。",
+        "uiContext": "当用户在登录表单中未填写必填项（如用户名）并尝试提交时，页面弹出提示框（alert）显示“此字段为必填项”，提醒用户补充必填信息。"
+    },
+    "messages.welcome": {
+        "source": "欢迎使用我们的应用",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Welcome to our application",
+            "ja": "ご利用いただきありがとうございます"
+        },
+        "businessContext": "该文本用于用户成功完成登录或初始化操作后，向用户传达欢迎信息，增强用户体验和亲切感。",
+        "uiContext": "文本以弹窗(alert)形式展示，出现在加载动画结束后，位于登录表单或应用首页的界面中央，提示用户欢迎使用应用。"
+    },
+    "messages.goodbye": {
+        "source": "感谢您的使用，再见！",
+        "sourceFile": "loginForm.js",
+        "translations": {
+            "en": "Thank you for using our service. Goodbye!",
+            "ja": "ご利用ありがとうございました。さようなら！"
+        },
+        "businessContext": "该文本用于提示用户确认退出操作，表达对用户使用产品的感谢，增强用户体验并礼貌结束会话。",
+        "uiContext": "在登录表单页面，当用户点击取消或关闭按钮时弹出确认对话框，文本内容“感谢您的使用，再见！”作为确认提示信息展示，用户需确认是否关闭窗口。"
+    }
+}
