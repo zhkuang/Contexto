@@ -6,6 +6,7 @@ export class Logger {
     private static instance: Logger;
     private logPath: string | null = null;
     private isDevMode: boolean = false;
+    private manuallyEnabled: boolean = false;
 
     private constructor() {
         this.initializeLogger();
@@ -19,10 +20,12 @@ export class Logger {
     }
 
     private initializeLogger() {
-        // 简化开发模式检测：通过环境变量或特定标识判断
-        this.isDevMode = process.env.NODE_ENV === 'development' ||
-                        process.env.VSCODE_DEBUG === 'true' ||
-                        Boolean(process.env.CONTEXTO_DEV); // 可以通过设置环境变量 CONTEXTO_DEV=true 来启用日志
+        // 检查是否手动启用或通过环境变量启用
+        const envDevMode = process.env.NODE_ENV === 'development' ||
+                          process.env.VSCODE_DEBUG === 'true' ||
+                          Boolean(process.env.CONTEXTO_DEV);
+        
+        this.isDevMode = this.manuallyEnabled || envDevMode;
 
         if (this.isDevMode) {
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -36,11 +39,16 @@ export class Logger {
                 
                 this.logPath = path.join(contextoDir, 'log.txt');
             }
+        } else {
+            this.logPath = null;
         }
     }
 
     public logAIRequest(prompt: string, type: string = 'request') {
+        console.log(`[Logger] 尝试记录AI请求日志: isDevMode=${this.isDevMode}, logPath=${this.logPath}`);
+        
         if (!this.isDevMode || !this.logPath) {
+            console.log('[Logger] 日志功能未启用或路径不存在，跳过记录');
             return;
         }
 
@@ -54,13 +62,17 @@ ${prompt}
 
         try {
             fs.appendFileSync(this.logPath, logEntry, 'utf8');
+            console.log(`[Logger] 成功写入AI请求日志到: ${this.logPath}`);
         } catch (error) {
             console.error('写入日志失败:', error);
         }
     }
 
     public logAIResponse(response: string, type: string = 'response') {
+        console.log(`[Logger] 尝试记录AI响应日志: isDevMode=${this.isDevMode}, logPath=${this.logPath}`);
+        
         if (!this.isDevMode || !this.logPath) {
+            console.log('[Logger] 日志功能未启用或路径不存在，跳过记录');
             return;
         }
 
@@ -74,6 +86,7 @@ ${response}
 
         try {
             fs.appendFileSync(this.logPath, logEntry, 'utf8');
+            console.log(`[Logger] 成功写入AI响应日志到: ${this.logPath}`);
         } catch (error) {
             console.error('写入日志失败:', error);
         }
@@ -96,11 +109,15 @@ ${response}
     }
 
     public enableDevLogging() {
-        this.isDevMode = true;
+        console.log('[Logger] 启用开发日志功能');
+        this.manuallyEnabled = true;
         this.initializeLogger();
+        console.log(`[Logger] 启用后状态: isDevMode=${this.isDevMode}, logPath=${this.logPath}`);
     }
 
     public disableDevLogging() {
+        console.log('[Logger] 禁用开发日志功能');
+        this.manuallyEnabled = false;
         this.isDevMode = false;
         this.logPath = null;
     }
