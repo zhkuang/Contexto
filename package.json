@@ -58,6 +58,16 @@
         "command": "contexto.openConfig",
         "title": "打开配置",
         "icon": "$(gear)"
+      },
+      {
+        "command": "contexto.clearLog",
+        "title": "清空日志",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "contexto.toggleDevLog",
+        "title": "切换开发日志",
+        "icon": "$(debug-console)"
       }
     ],
     "menus": {

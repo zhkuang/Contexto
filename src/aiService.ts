@@ -1,11 +1,14 @@
 import axios from 'axios';
 import { AIService, TranslationTask, ContextoConfig } from './types';
+import { Logger } from './logger';
 
 export class OpenAIService implements AIService {
     private config: ContextoConfig['aiService'];
+    private logger: Logger;
 
     constructor(config: ContextoConfig['aiService']) {
         this.config = config;
+        this.logger = Logger.getInstance();
     }
 
     /**
@@ -27,7 +30,14 @@ export class OpenAIService implements AIService {
         for (const [targetLang, langTasks] of tasksByLang) {
             try {
                 const prompt = this.buildTranslationPrompt(langTasks, targetLang);
+                
+                // 记录翻译请求日志
+                this.logger.logAIRequest(prompt, `TRANSLATION_REQUEST_${targetLang}`);
+                
                 const response = await this.callAI(prompt);
+                
+                // 记录翻译响应日志
+                this.logger.logAIResponse(response, `TRANSLATION_RESPONSE_${targetLang}`);
                 
                 // 解析AI响应
                 const translations = this.parseTranslationResponse(response, langTasks);
@@ -54,7 +64,14 @@ export class OpenAIService implements AIService {
         const prompt = this.buildContextAnalysisPrompt(key, source, filePath, fileContent);
         
         try {
+            // 记录上下文分析请求日志
+            this.logger.logAIRequest(prompt, 'CONTEXT_ANALYSIS_REQUEST');
+            
             const response = await this.callAI(prompt);
+            
+            // 记录上下文分析响应日志
+            this.logger.logAIResponse(response, 'CONTEXT_ANALYSIS_RESPONSE');
+            
             return this.parseContextResponse(response);
         } catch (error) {
             console.error(`上下文分析失败:`, error);

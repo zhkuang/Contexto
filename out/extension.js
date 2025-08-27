@@ -4,6 +4,7 @@ exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const contextoCore_1 = require("./contextoCore");
 const treeProvider_1 = require("./treeProvider");
+const logger_1 = require("./logger");
 let core = null;
 let treeProvider;
 let statusProvider;
@@ -134,6 +135,32 @@ const commands = {
         }
         catch (error) {
             vscode.window.showErrorMessage(`打开配置文件失败: ${error}`);
+        }
+    }),
+    clearLog: vscode.commands.registerCommand('contexto.clearLog', async () => {
+        try {
+            const logger = logger_1.Logger.getInstance();
+            logger.clearLog();
+            vscode.window.showInformationMessage('日志已清空');
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`清空日志失败: ${error}`);
+        }
+    }),
+    toggleDevLog: vscode.commands.registerCommand('contexto.toggleDevLog', async () => {
+        try {
+            const logger = logger_1.Logger.getInstance();
+            if (logger.isLoggingEnabled()) {
+                logger.disableDevLogging();
+                vscode.window.showInformationMessage('开发日志已关闭');
+            }
+            else {
+                logger.enableDevLogging();
+                vscode.window.showInformationMessage('开发日志已启用，日志将保存到 contexto/log.txt');
+            }
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`切换日志失败: ${error}`);
         }
     })
 };

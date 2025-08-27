@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ContextoCore } from './contextoCore';
 import { ContextoProvider, ContextoStatusProvider } from './treeProvider';
+import { Logger } from './logger';
 
 let core: ContextoCore | null = null;
 let treeProvider: ContextoProvider;
@@ -154,6 +155,31 @@ const commands = {
             await vscode.window.showTextDocument(doc);
         } catch (error) {
             vscode.window.showErrorMessage(`打开配置文件失败: ${error}`);
+        }
+    }),
+
+    clearLog: vscode.commands.registerCommand('contexto.clearLog', async () => {
+        try {
+            const logger = Logger.getInstance();
+            logger.clearLog();
+            vscode.window.showInformationMessage('日志已清空');
+        } catch (error) {
+            vscode.window.showErrorMessage(`清空日志失败: ${error}`);
+        }
+    }),
+
+    toggleDevLog: vscode.commands.registerCommand('contexto.toggleDevLog', async () => {
+        try {
+            const logger = Logger.getInstance();
+            if (logger.isLoggingEnabled()) {
+                logger.disableDevLogging();
+                vscode.window.showInformationMessage('开发日志已关闭');
+            } else {
+                logger.enableDevLogging();
+                vscode.window.showInformationMessage('开发日志已启用，日志将保存到 contexto/log.txt');
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`切换日志失败: ${error}`);
         }
     })
 };

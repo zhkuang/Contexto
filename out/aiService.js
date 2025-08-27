@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenAIService = void 0;
 const axios_1 = require("axios");
+const logger_1 = require("./logger");
 class OpenAIService {
     constructor(config) {
         this.config = config;
+        this.logger = logger_1.Logger.getInstance();
     }
     /**
      * 翻译文本
@@ -23,7 +25,11 @@ class OpenAIService {
         for (const [targetLang, langTasks] of tasksByLang) {
             try {
                 const prompt = this.buildTranslationPrompt(langTasks, targetLang);
+                // 记录翻译请求日志
+                this.logger.logAIRequest(prompt, `TRANSLATION_REQUEST_${targetLang}`);
                 const response = await this.callAI(prompt);
+                // 记录翻译响应日志
+                this.logger.logAIResponse(response, `TRANSLATION_RESPONSE_${targetLang}`);
                 // 解析AI响应
                 const translations = this.parseTranslationResponse(response, langTasks);
                 Object.assign(results, translations);
@@ -44,7 +50,11 @@ class OpenAIService {
     async analyzeContext(key, source, filePath, fileContent) {
         const prompt = this.buildContextAnalysisPrompt(key, source, filePath, fileContent);
         try {
+            // 记录上下文分析请求日志
+            this.logger.logAIRequest(prompt, 'CONTEXT_ANALYSIS_REQUEST');
             const response = await this.callAI(prompt);
+            // 记录上下文分析响应日志
+            this.logger.logAIResponse(response, 'CONTEXT_ANALYSIS_RESPONSE');
             return this.parseContextResponse(response);
         }
         catch (error) {
