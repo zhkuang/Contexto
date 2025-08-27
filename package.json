@@ -30,13 +30,6 @@
           "name": "翻译管理",
           "when": "true",
           "icon": "$(list-unordered)"
-        },
-        {
-          "id": "contextoWebview",
-          "name": "控制面板",
-          "type": "webview",
-          "when": "true",
-          "icon": "$(dashboard)"
         }
       ]
     },
@@ -70,14 +63,19 @@
     "menus": {
       "view/title": [
         {
-          "command": "contexto.refresh",
+          "command": "contexto.translateKeys",
           "when": "view == contexto",
           "group": "navigation@1"
         },
         {
-          "command": "contexto.openConfig",
+          "command": "contexto.refresh",
           "when": "view == contexto",
           "group": "navigation@2"
+        },
+        {
+          "command": "contexto.openConfig",
+          "when": "view == contexto",
+          "group": "navigation@3"
         }
       ],
       "view/item/context": [

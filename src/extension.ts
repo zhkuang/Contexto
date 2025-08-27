@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
 import { ContextoCore } from './contextoCore';
 import { ContextoProvider, ContextoStatusProvider } from './treeProvider';
-import { ContextoWebviewProvider } from './webviewProvider';
 
 let core: ContextoCore | null = null;
 let treeProvider: ContextoProvider;
 let statusProvider: ContextoStatusProvider;
-let webviewProvider: ContextoWebviewProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Contexto插件已激活');
@@ -14,18 +12,12 @@ export function activate(context: vscode.ExtensionContext) {
     // 初始化providers
     treeProvider = new ContextoProvider();
     statusProvider = new ContextoStatusProvider();
-    webviewProvider = new ContextoWebviewProvider(context.extensionUri);
 
     // 注册tree view
     const treeView = vscode.window.createTreeView('contexto', {
         treeDataProvider: treeProvider,
         showCollapseAll: true
     });
-
-    // 注册webview provider
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('contextoWebview', webviewProvider)
-    );
 
     // 检查工作区并初始化
     initializeWorkspace();
@@ -61,8 +53,6 @@ async function initializeWorkspace() {
         core = null;
         statusProvider.updateStatus(null, null);
         treeProvider.refresh();
-        webviewProvider.setCore(null);
-        webviewProvider.setAnalysis(null);
         return;
     }
 
@@ -74,13 +64,9 @@ async function initializeWorkspace() {
         await treeProvider.setCore(core);
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
-        webviewProvider.setCore(core);
-        webviewProvider.setAnalysis(analysis);
     } else {
         statusProvider.updateStatus(core, null);
         treeProvider.refresh();
-        webviewProvider.setCore(core);
-        webviewProvider.setAnalysis(null);
     }
 }
 
@@ -96,8 +82,6 @@ const commands = {
             await treeProvider.setCore(core);
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
-            webviewProvider.setCore(core);
-            webviewProvider.setAnalysis(analysis);
             
             // 打开配置文件让用户配置
             const configPath = core.getConfigPath();
@@ -121,7 +105,6 @@ const commands = {
             await treeProvider.updateAnalysis();
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
-            webviewProvider.setAnalysis(analysis);
         } catch (error) {
             vscode.window.showErrorMessage(`刷新失败: ${error}`);
         }
@@ -138,7 +121,6 @@ const commands = {
             await treeProvider.updateAnalysis();
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
-            webviewProvider.setAnalysis(analysis);
         } catch (error) {
             vscode.window.showErrorMessage(`删除失败: ${error}`);
         }
@@ -155,7 +137,6 @@ const commands = {
             await treeProvider.updateAnalysis();
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
-            webviewProvider.setAnalysis(analysis);
         } catch (error) {
             vscode.window.showErrorMessage(`翻译失败: ${error}`);
         }

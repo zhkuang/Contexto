@@ -207,6 +207,9 @@ export class ContextoCore {
                 const fileContent = fs.readFileSync(filePath, 'utf-8');
                 const context = await this.aiService.analyzeContext(key, source, filePath, fileContent);
 
+                // 检查是否为更新的key
+                const isUpdatedKey = this.analysis?.updatedKeys.includes(key);
+
                 // 更新或创建缓存项
                 if (!this.cache[key]) {
                     this.cache[key] = {
@@ -214,8 +217,16 @@ export class ContextoCore {
                         sourceFile: path.relative(this.configManager.getWorkspaceRoot(), filePath),
                         translations: {}
                     };
+                } else {
+                    // 如果是更新的key，删除旧的翻译并更新源文本
+                    if (isUpdatedKey) {
+                        console.log(`检测到更新key "${key}"，删除旧翻译并更新源文本`);
+                        this.cache[key].translations = {}; // 清空旧的翻译
+                        this.cache[key].source = source; // 更新源文本
+                    }
                 }
 
+                // 更新上下文信息和源文件路径
                 this.cache[key].businessContext = context.businessContext;
                 if (context.uiContext && context.uiContext !== '非UI文本') {
                     this.cache[key].uiContext = context.uiContext;
@@ -245,9 +256,18 @@ export class ContextoCore {
             if (!item.translations) {
                 item.translations = {};
             }
+
+            // 检查是否为更新的key
+            const isUpdatedKey = this.analysis?.updatedKeys.includes(key);
             
             for (const targetLang of this.config.targetLangs) {
-                if (!item.translations[targetLang] || item.translations[targetLang].trim() === '') {
+                // 对于更新的key，强制重新翻译所有目标语言
+                // 对于新增和待翻译的key，只翻译缺失的语言
+                const needsTranslation = isUpdatedKey || 
+                    !item.translations[targetLang] || 
+                    item.translations[targetLang].trim() === '';
+
+                if (needsTranslation) {
                     tasks.push({
                         key,
                         source: item.source,
@@ -261,6 +281,8 @@ export class ContextoCore {
 
         if (tasks.length === 0) return;
 
+        console.log(`准备翻译 ${tasks.length} 个任务`);
+
         // 执行批量翻译
         const results = await this.aiService.translateText(tasks);
 
@@ -273,6 +295,7 @@ export class ContextoCore {
                     this.cache[key].translations = {};
                 }
                 this.cache[key].translations[targetLang] = translation;
+                console.log(`更新翻译: ${key} -> ${targetLang}: ${translation}`);
             }
         }
     }
