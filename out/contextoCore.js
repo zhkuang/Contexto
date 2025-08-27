@@ -237,18 +237,38 @@ class ContextoCore {
         console.log(`准备翻译 ${tasks.length} 个任务`);
         // 执行批量翻译
         const results = await this.aiService.translateText(tasks);
+        console.log(`AI翻译完成，返回结果数量: ${Object.keys(results).length}`);
+        console.log('翻译结果:', results);
         // 更新缓存
+        let updatedCount = 0;
         for (const [resultKey, translation] of Object.entries(results)) {
-            const [key, targetLang] = resultKey.split('_');
-            if (this.cache[key] && translation.trim()) {
-                // 确保 translations 字段存在
-                if (!this.cache[key].translations) {
-                    this.cache[key].translations = {};
+            // 修复：正确解析结果键，避免key本身包含下划线时出错
+            const lastUnderscoreIndex = resultKey.lastIndexOf('_');
+            if (lastUnderscoreIndex === -1) {
+                console.log(`跳过无效的结果键: ${resultKey}`);
+                continue;
+            }
+            const key = resultKey.substring(0, lastUnderscoreIndex);
+            const targetLang = resultKey.substring(lastUnderscoreIndex + 1);
+            if (this.cache[key]) {
+                if (translation && translation.trim() && !translation.startsWith('[翻译失败:')) {
+                    // 确保 translations 字段存在
+                    if (!this.cache[key].translations) {
+                        this.cache[key].translations = {};
+                    }
+                    this.cache[key].translations[targetLang] = translation;
+                    updatedCount++;
+                    console.log(`✅ 更新翻译: ${key} -> ${targetLang}: ${translation}`);
                 }
-                this.cache[key].translations[targetLang] = translation;
-                console.log(`更新翻译: ${key} -> ${targetLang}: ${translation}`);
+                else {
+                    console.log(`⚠️ 跳过无效翻译: ${key} -> ${targetLang}: ${translation}`);
+                }
+            }
+            else {
+                console.log(`❌ 缓存中找不到key: ${key}`);
             }
         }
+        console.log(`缓存更新完成，共更新 ${updatedCount} 个翻译`);
     }
     /**
      * 加载源字典

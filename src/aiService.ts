@@ -44,9 +44,9 @@ export class OpenAIService implements AIService {
                 Object.assign(results, translations);
             } catch (error) {
                 console.error(`翻译失败 (${targetLang}):`, error);
-                // 为失败的任务设置空值
+                // 为失败的任务设置错误标记，而不是空值
                 for (const task of langTasks) {
-                    results[`${task.key}_${task.targetLang}`] = '';
+                    results[`${task.key}_${task.targetLang}`] = `[翻译失败: ${error}]`;
                 }
             }
         }
@@ -216,6 +216,8 @@ UI场景：[具体描述文本在用户界面中的展示位置、交互场景�
         const results: Record<string, string> = {};
         const lines = response.split('\n').filter(line => line.trim());
         
+        console.log(`解析翻译响应，响应行数: ${lines.length}, 任务数: ${tasks.length}`);
+        
         for (let i = 0; i < Math.min(lines.length, tasks.length); i++) {
             const line = lines[i];
             const match = line.match(/^\d+\.\s*(.+)$/);
@@ -224,6 +226,8 @@ UI场景：[具体描述文本在用户界面中的展示位置、交互场景�
                 const translation = match[1].trim();
                 const key = `${tasks[i].key}_${tasks[i].targetLang}`;
                 results[key] = translation;
+            } else {
+                console.log(`跳过无效行 ${i}: ${line}`);
             }
         }
         
