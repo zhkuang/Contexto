@@ -27,18 +27,18 @@ export class ContextoCore {
             return false;
         }
 
-        console.log('开始加载配置...');
+        console.log('正在加载项目配置...');
         // 加载配置
         this.config = await this.configManager.loadConfig();
         if (!this.config) {
-            console.log('配置加载失败');
+            console.log('项目配置加载失败');
             return false;
         }
-        console.log('配置加载成功:', this.config);
+        console.log('项目配置加载成功:', this.config);
 
         // 检查AI服务配置
         if (!this.config.aiService.apiKey) {
-            vscode.window.showWarningMessage('请在config.json中配置AI服务的API密钥');
+            vscode.window.showWarningMessage('请在 config.json 中配置 AI 服务的 API 密钥后再使用翻译功能');
         }
 
         // 初始化服务
@@ -47,7 +47,7 @@ export class ContextoCore {
 
         // 加载缓存
         this.cache = await this.configManager.loadCache();
-        console.log('翻译缓存加载完成，包含Key数量:', Object.keys(this.cache).length);
+        console.log('翻译缓存初始化完成，已加载文本项数量:', Object.keys(this.cache).length);
 
         // 自动执行首次分析
         await this.refreshAnalysis();
@@ -68,13 +68,13 @@ export class ContextoCore {
      */
     async refreshAnalysis(): Promise<KeyAnalysis | null> {
         if (!this.keyAnalyzer) {
-            console.log('KeyAnalyzer未初始化，无法执行分析');
+            console.log('文本分析器未初始化，无法执行分析');
             return null;
         }
 
-        console.log('开始执行Key分析...');
+        console.log('正在执行文本项分析...');
         this.analysis = await this.keyAnalyzer.analyzeKeys(this.cache);
-        console.log('Key分析完成:', {
+        console.log('文本项分析完成:', {
             新增: this.analysis.newKeys.length,
             更新: this.analysis.updatedKeys.length,
             待翻译: this.analysis.pendingKeys.length,
@@ -93,17 +93,17 @@ export class ContextoCore {
         }
 
         if (!this.analysis || this.analysis.obsoleteKeys.length === 0) {
-            vscode.window.showInformationMessage('没有需要删除的未使用Key');
+            vscode.window.showInformationMessage('当前没有需要清理的废弃文本项');
             return;
         }
 
         const result = await vscode.window.showInformationMessage(
-            `确定要删除 ${this.analysis.obsoleteKeys.length} 个未使用的Key吗？`,
-            '删除',
+            `检测到 ${this.analysis.obsoleteKeys.length} 个废弃的文本项，是否确认删除？`,
+            '确认删除',
             '取消'
         );
 
-        if (result === '删除') {
+        if (result === '确认删除') {
             for (const key of this.analysis.obsoleteKeys) {
                 delete this.cache[key];
             }
@@ -111,7 +111,7 @@ export class ContextoCore {
             await this.configManager.saveCache(this.cache);
             await this.refreshAnalysis();
             
-            vscode.window.showInformationMessage(`已删除 ${this.analysis.obsoleteKeys.length} 个未使用的Key`);
+            vscode.window.showInformationMessage(`清理完成！已删除 ${this.analysis.obsoleteKeys.length} 个废弃的文本项`);
         }
     }
 
@@ -134,52 +134,52 @@ export class ContextoCore {
         ];
 
         if (keysToProcess.length === 0) {
-            vscode.window.showInformationMessage('没有需要翻译的Key');
+            vscode.window.showInformationMessage('当前没有需要翻译的新文本项');
             return;
         }
 
         // 检查AI服务配置
         if (!this.config.aiService.apiKey) {
-            vscode.window.showErrorMessage('请先在config.json中配置AI服务的API密钥');
+            vscode.window.showErrorMessage('请先在 config.json 中配置 AI 服务的 API 密钥');
             return;
         }
 
         const result = await vscode.window.showInformationMessage(
-            `确定要翻译 ${keysToProcess.length} 个Key吗？`,
-            '翻译',
+            `发现 ${keysToProcess.length} 个待翻译的文本项，是否开始翻译？`,
+            '开始翻译',
             '取消'
         );
 
-        if (result !== '翻译') {
+        if (result !== '开始翻译') {
             return;
         }
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: "正在翻译...",
+            title: "AI 翻译处理中",
             cancellable: false
         }, async (progress) => {
             try {
                 // 1. 获取文件映射
-                progress.report({ message: "分析文件关联..." });
+                progress.report({ message: "正在分析文件依赖关系..." });
                 const keyToFiles = await this.keyAnalyzer!.getMinimalFileSet(keysToProcess);
                 
                 // 2. 分析上下文
-                progress.report({ message: "分析上下文..." });
+                progress.report({ message: "正在分析文本使用上下文..." });
                 await this.analyzeContextForKeys(keysToProcess, keyToFiles);
                 
                 // 3. 执行翻译
-                progress.report({ message: "执行翻译..." });
+                progress.report({ message: "正在生成多语言翻译..." });
                 await this.performTranslation(keysToProcess);
                 
                 // 4. 保存结果
-                progress.report({ message: "保存结果..." });
+                progress.report({ message: "正在保存翻译结果..." });
                 await this.configManager.saveCache(this.cache);
                 await this.refreshAnalysis();
                 
-                vscode.window.showInformationMessage(`翻译完成！已处理 ${keysToProcess.length} 个Key`);
+                vscode.window.showInformationMessage(`翻译任务已完成！成功处理了 ${keysToProcess.length} 个文本项`);
             } catch (error) {
-                vscode.window.showErrorMessage(`翻译失败: ${error}`);
+                vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
             }
         });
     }

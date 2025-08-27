@@ -52,7 +52,7 @@ export class ConfigManager {
             await this.saveCache({});
         }
 
-        vscode.window.showInformationMessage('Contexto项目初始化成功！请在config.json中配置您的AI服务信息。');
+        vscode.window.showInformationMessage('Contexto 项目初始化成功！请在 config.json 中配置您的 AI 服务信息。');
     }
 
     /**
@@ -67,7 +67,7 @@ export class ConfigManager {
             const content = fs.readFileSync(this.configPath, 'utf-8');
             return JSON.parse(content) as ContextoConfig;
         } catch (error) {
-            vscode.window.showErrorMessage(`加载配置文件失败: ${error}`);
+            vscode.window.showErrorMessage(`配置文件加载失败：${error}`);
             return null;
         }
     }
@@ -80,7 +80,7 @@ export class ConfigManager {
             const content = JSON.stringify(config, null, 4);
             fs.writeFileSync(this.configPath, content, 'utf-8');
         } catch (error) {
-            vscode.window.showErrorMessage(`保存配置文件失败: ${error}`);
+            vscode.window.showErrorMessage(`配置文件保存失败：${error}`);
             throw error;
         }
     }
@@ -106,7 +106,7 @@ export class ConfigManager {
             
             return cache;
         } catch (error) {
-            vscode.window.showErrorMessage(`加载翻译缓存失败: ${error}`);
+            vscode.window.showErrorMessage(`翻译缓存加载失败：${error}`);
             return {};
         }
     }
@@ -119,7 +119,7 @@ export class ConfigManager {
             const content = JSON.stringify(cache, null, 4);
             fs.writeFileSync(this.cachePath, content, 'utf-8');
         } catch (error) {
-            vscode.window.showErrorMessage(`保存翻译缓存失败: ${error}`);
+            vscode.window.showErrorMessage(`翻译缓存保存失败：${error}`);
             throw error;
         }
     }

@@ -27,20 +27,20 @@ export class KeyAnalyzer {
         if (fs.existsSync(sourceDictPath)) {
             try {
                 sourceDict = await this.parserManager.parseDict(sourceDictPath);
-                console.log(`成功扫描源字典文件: ${sourceDictPath}, 找到 ${Object.keys(sourceDict).length} 个Key`);
+                console.log(`源字典文件扫描完成：${sourceDictPath}，发现 ${Object.keys(sourceDict).length} 个文本项`);
             } catch (error) {
-                vscode.window.showErrorMessage(`解析源字典文件失败: ${error}`);
+                vscode.window.showErrorMessage(`源字典文件解析失败：${error}`);
                 console.error('解析错误详情:', error);
             }
         } else {
-            vscode.window.showWarningMessage(`源字典文件不存在: ${this.config.sourceLangDict}，请检查配置路径是否正确（应为相对于项目根目录的路径）`);
+            vscode.window.showWarningMessage(`源字典文件不存在：${this.config.sourceLangDict}，请检查配置路径是否正确（应为相对于项目根目录的路径）`);
             console.log(`源字典文件路径: ${sourceDictPath}`);
         }
 
         const sourceKeys = new Set(Object.keys(sourceDict));
         const cacheKeys = new Set(Object.keys(cache));
 
-        console.log(`Key分析开始: 源字典 ${sourceKeys.size} 个key, 缓存 ${cacheKeys.size} 个key`);
+        console.log(`文本项分析开始：源字典包含 ${sourceKeys.size} 个文本项，缓存包含 ${cacheKeys.size} 个文本项`);
         console.log(`目标语言: ${this.config.targetLangs.join(', ')}`);
 
         // 第一步：找出在源字典中但项目中未被使用的key
@@ -101,7 +101,7 @@ export class KeyAnalyzer {
                     console.log(`key "${key}" 缺少翻译的语言:`, missingTargetLangs);
                     pendingKeys.push(key);
                 } else {
-                    console.log(`key "${key}" 翻译完整`);
+                    console.log(`文本项 "${key}" 翻译状态完整`);
                 }
                 // 如果翻译完整，则不需要处理（状态正常）
             }

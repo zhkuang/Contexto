@@ -66,7 +66,7 @@ export class LoginForm {
         setTimeout(() => {
             this.hideLoading();
             alert(t('messages.welcome'));
-            console.log(t('messages.app'));
+            console.log(t('validation.password_too_short'));
         }, 2000);
     }
     

@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 监听配置文件变化
     vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (core && document.fileName.endsWith('contexto/config.json')) {
-            console.log('检测到config.json文件保存，重新初始化...');
+            console.log('检测到 config.json 文件保存，正在重新初始化项目...');
             await initializeWorkspace();
         }
     });
@@ -74,7 +74,7 @@ async function initializeWorkspace() {
 const commands = {
     initProject: vscode.commands.registerCommand('contexto.initProject', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('请先打开一个项目');
+            vscode.window.showErrorMessage('请先打开一个有效的项目文件夹');
             return;
         }
 
@@ -89,10 +89,10 @@ const commands = {
             const doc = await vscode.workspace.openTextDocument(configPath);
             await vscode.window.showTextDocument(doc);
             
-            vscode.window.showInformationMessage('项目初始化完成！请配置AI服务信息，保存后将自动扫描源字典文件。');
+            vscode.window.showInformationMessage('项目初始化完成！请配置 AI 服务信息，保存后将自动扫描源字典文件。');
             
         } catch (error) {
-            vscode.window.showErrorMessage(`初始化失败: ${error}`);
+            vscode.window.showErrorMessage(`项目初始化失败：${error}`);
         }
     }),
 
@@ -107,13 +107,13 @@ const commands = {
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
         } catch (error) {
-            vscode.window.showErrorMessage(`刷新失败: ${error}`);
+            vscode.window.showErrorMessage(`数据刷新失败：${error}`);
         }
     }),
 
     deleteKeys: vscode.commands.registerCommand('contexto.deleteKeys', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('项目未初始化');
+            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
             return;
         }
 
@@ -123,13 +123,13 @@ const commands = {
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
         } catch (error) {
-            vscode.window.showErrorMessage(`删除失败: ${error}`);
+            vscode.window.showErrorMessage(`文本清理失败：${error}`);
         }
     }),
 
     translateKeys: vscode.commands.registerCommand('contexto.translateKeys', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('项目未初始化');
+            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
             return;
         }
 
@@ -139,13 +139,13 @@ const commands = {
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
         } catch (error) {
-            vscode.window.showErrorMessage(`翻译失败: ${error}`);
+            vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
         }
     }),
 
     openConfig: vscode.commands.registerCommand('contexto.openConfig', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('项目未初始化');
+            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
             return;
         }
 
@@ -154,7 +154,7 @@ const commands = {
             const doc = await vscode.workspace.openTextDocument(configPath);
             await vscode.window.showTextDocument(doc);
         } catch (error) {
-            vscode.window.showErrorMessage(`打开配置文件失败: ${error}`);
+            vscode.window.showErrorMessage(`配置文件打开失败：${error}`);
         }
     }),
 
@@ -162,9 +162,9 @@ const commands = {
         try {
             const logger = Logger.getInstance();
             logger.clearLog();
-            vscode.window.showInformationMessage('日志已清空');
+            vscode.window.showInformationMessage('日志文件已清空');
         } catch (error) {
-            vscode.window.showErrorMessage(`清空日志失败: ${error}`);
+            vscode.window.showErrorMessage(`日志清空失败：${error}`);
         }
     }),
 
@@ -173,10 +173,10 @@ const commands = {
             const logger = Logger.getInstance();
             if (logger.isLoggingEnabled()) {
                 logger.disableDevLogging();
-                vscode.window.showInformationMessage('开发日志已关闭');
+                vscode.window.showInformationMessage('开发日志功能已关闭');
             } else {
                 logger.enableDevLogging();
-                vscode.window.showInformationMessage('开发日志已启用，日志将保存到 contexto/log.txt');
+                vscode.window.showInformationMessage('开发日志功能已启用，日志将保存到 contexto/log.txt');
             }
         } catch (error) {
             vscode.window.showErrorMessage(`切换日志失败: ${error}`);

@@ -74,10 +74,10 @@ export class OpenAIService implements AIService {
             
             return this.parseContextResponse(response);
         } catch (error) {
-            console.error(`上下文分析失败:`, error);
+            console.error(`文本上下文分析失败：`, error);
             return {
-                businessContext: '无法分析业务上下文',
-                uiContext: '无法分析UI上下文'
+                businessContext: '业务上下文分析失败',
+                uiContext: 'UI 上下文分析失败'
             };
         }
     }
@@ -102,26 +102,28 @@ export class OpenAIService implements AIService {
 
         const targetLangName = langMap[targetLang] || targetLang;
 
-        let prompt = `请将以下中文文本翻译成${targetLangName}，要求符合软件国际化标准，保持专业性和准确性。
+        let prompt = `请将以下中文文本翻译成 ${targetLangName}，严格遵循软件国际化标准。
 
-翻译要求：
-1. 保持原文的语气和风格
-2. 考虑业务场景和UI场景的上下文
-3. 使用目标语言的本土化表达
-4. 保持技术术语的准确性
-5. 返回格式：每行一个翻译结果，格式为 "序号. 翻译结果"
+🌍 翻译要求：
+1. 保持原文的语气、语调和专业水准
+2. 深度理解业务场景和UI上下文，确保翻译贴合使用场景
+3. 采用目标语言的地道表达，避免翻译腔
+4. 准确传达技术术语和业务概念
+5. 保持文本长度适中，符合界面展示需求
 
-待翻译内容：
+📋 返回格式：每行一个翻译结果，格式为 "序号. 翻译结果"
+
+📝 待翻译内容：
 
 `;
 
         tasks.forEach((task, index) => {
-            prompt += `${index + 1}. 原文：${task.source}\n`;
+            prompt += `${index + 1}. 📝 原文：${task.source}\n`;
             if (task.businessContext) {
-                prompt += `   业务场景：${task.businessContext}\n`;
+                prompt += `   💼 业务场景：${task.businessContext}\n`;
             }
             if (task.uiContext) {
-                prompt += `   UI场景：${task.uiContext}\n`;
+                prompt += `   🎨 UI场景：${task.uiContext}\n`;
             }
             prompt += '\n';
         });
@@ -133,25 +135,25 @@ export class OpenAIService implements AIService {
      * 构建上下文分析提示词
      */
     private buildContextAnalysisPrompt(key: string, source: string, filePath: string, fileContent: string): string {
-        return `请分析以下代码中文本的使用上下文，并提供业务场景和UI场景的描述。
+        return `请深入分析以下代码中文本的使用上下文，提供详细的业务场景和UI场景描述。
 
-文件路径：${filePath}
-文本Key：${key}
-文本内容：${source}
+📁 文件路径：${filePath}
+🔑 文本标识：${key}
+📝 文本内容：${source}
 
-代码片段：
+代码上下文：
 \`\`\`
 ${this.extractRelevantCode(fileContent, key)}
 \`\`\`
 
 请按以下格式返回分析结果：
-业务场景：[描述这个文本在业务逻辑中的作用和意义]
-UI场景：[描述这个文本在用户界面中的展示位置和交互场景，如果不是UI相关则说明"非UI文本"]
+业务场景：[详细描述这个文本在业务逻辑中的具体作用、使用时机和业务含义]
+UI场景：[具体描述文本在用户界面中的展示位置、交互场景、展示时机等，如非UI文本请说明"非UI文本"]
 
-要求：
-1. 业务场景描述要客观清晰，说明文本的业务含义
-2. UI场景描述要具体，包括展示位置、交互时机等
-3. 描述要简洁明了，避免冗余信息`;
+分析要求：
+1. 业务场景分析要深入准确，说明文本的具体业务价值
+2. UI场景描述要具体详细，包括展示位置、用户交互、显示条件等
+3. 避免模糊描述，提供有价值的上下文信息`;
     }
 
     /**
