@@ -73,6 +73,7 @@ export class LoginForm {
     handleCancel() {
         if (confirm(t('messages.goodbye'))) {
             window.close();
+            console.log(t('validation.test'));
         }
     }
     

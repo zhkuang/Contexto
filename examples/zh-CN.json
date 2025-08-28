@@ -22,6 +22,7 @@
         "email": "邮箱"
     },
     "validation": {
+        "test": "测试项",
         "required": "此字段为必填项",
         "email_invalid": "邮箱格式不正确",
         "password_too_short": "密码长度至少8位",

@@ -141,12 +141,12 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         return Promise.resolve([]);
     }
 
-    private async getRootElements(): Promise<KeyTreeItem[]> {
+    private async getRootElements(): Promise<(KeyTreeItem | WelcomeItem)[]> {
         if (!this.core || !this.analysis) {
             return [];
         }
 
-        const elements: KeyTreeItem[] = [];
+        const elements: (KeyTreeItem | WelcomeItem)[] = [];
 
         // New keys
         if (this.analysis.newKeys.length > 0) {
@@ -178,14 +178,17 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
             ));
         }
 
-        // Obsolete keys
-        if (this.analysis.obsoleteKeys.length > 0) {
-            elements.push(new KeyTreeItem(
-                '未使用Key',
-                vscode.TreeItemCollapsibleState.Collapsed,
-                KeyStatus.OBSOLETE,
-                this.analysis.obsoleteKeys.length
-            ));
+        // Show empty state message if no translation tasks
+        if (elements.length === 0) {
+            return [
+                new WelcomeItem(''),
+                new WelcomeItem('🎉 太棒了！所有翻译都已完成'),
+                new WelcomeItem(''),
+                new WelcomeItem('✅ 当前项目没有待处理的翻译任务'),
+                new WelcomeItem('📝 继续开发，我们会自动检测新的翻译需求'),
+                new WelcomeItem(''),
+                new WelcomeItem('💡 提示：修改代码中的文本时，刷新即可看到新的翻译任务')
+            ];
         }
 
         return elements;
@@ -266,14 +269,14 @@ export class ContextoStatusProvider {
         }
 
         const totalKeys = analysis.newKeys.length + analysis.updatedKeys.length + 
-                         analysis.pendingKeys.length + analysis.obsoleteKeys.length;
+                         analysis.pendingKeys.length;
         
         if (totalKeys === 0) {
             this.statusBarItem.text = '$(globe) Contexto: 已同步';
             this.statusBarItem.tooltip = '所有翻译都是最新的';
         } else {
             this.statusBarItem.text = `$(globe) Contexto: ${totalKeys}个待处理`;
-            this.statusBarItem.tooltip = `新增: ${analysis.newKeys.length}, 更新: ${analysis.updatedKeys.length}, 待翻译: ${analysis.pendingKeys.length}, 未使用: ${analysis.obsoleteKeys.length}`;
+            this.statusBarItem.tooltip = `新增: ${analysis.newKeys.length}, 更新: ${analysis.updatedKeys.length}, 待翻译: ${analysis.pendingKeys.length}`;
         }
         
         this.statusBarItem.command = 'contexto.refresh';
