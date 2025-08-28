@@ -54,9 +54,17 @@ class IndividualKeyItem extends vscode.TreeItem {
 
 // Welcome message item for uninitialized projects
 class WelcomeItem extends vscode.TreeItem {
-    constructor(public readonly message: string) {
+    constructor(public readonly message: string, public readonly isPlaceholder: boolean = false) {
         super(message, vscode.TreeItemCollapsibleState.None);
         this.contextValue = 'welcomeMessage';
+        
+        if (isPlaceholder) {
+            // 使用更淡的颜色样式
+            this.iconPath = undefined;
+            this.description = '';
+            // 设置为更淡的文字颜色
+            this.resourceUri = undefined;
+        }
     }
 }
 
@@ -182,12 +190,9 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         if (elements.length === 0) {
             return [
                 new WelcomeItem(''),
-                new WelcomeItem('所有翻译都已完成'),
+                new WelcomeItem('所有翻译已同步', true),
                 new WelcomeItem(''),
-                new WelcomeItem('当前项目没有待处理的翻译任务'),
-                new WelcomeItem('继续开发，我们会自动检测新的翻译需求'),
-                new WelcomeItem(''),
-                new WelcomeItem('提示：修改代码中的文本时，刷新即可看到新的翻译任务')
+                new WelcomeItem('修改代码文本后刷新查看新任务', true)
             ];
         }
 

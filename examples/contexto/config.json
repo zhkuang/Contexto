@@ -1,9 +1,7 @@
 {
     "sourceLangDict": "zh-CN.json",
     "targetLangs": [
-        "en",
-        "ja",
-        "ko"
+        "en"
     ],
     "ignore": [
         "./contexto",
