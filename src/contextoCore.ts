@@ -476,6 +476,21 @@ export class ContextoCore {
     }
 
     /**
+     * 保存缓存数据
+     */
+    async saveCache(): Promise<void> {
+        await this.configManager.saveCache(this.cache);
+    }
+
+    /**
+     * 重新加载缓存数据
+     */
+    async reloadCache(): Promise<void> {
+        this.cache = await this.configManager.loadCache();
+        console.log('缓存数据已重新加载，当前缓存项数量:', Object.keys(this.cache).length);
+    }
+
+    /**
      * 获取工作区根目录
      */
     getWorkspaceRoot(): string {

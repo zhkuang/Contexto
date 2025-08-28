@@ -76,6 +76,11 @@
         "icon": "$(export)"
       },
       {
+        "command": "contexto.showI18nViewer",
+        "title": "查看i18n数据",
+        "icon": "$(table)"
+      },
+      {
         "command": "contexto.refresh",
         "title": "刷新",
         "icon": "$(refresh)"
@@ -109,14 +114,19 @@
           "group": "navigation@2"
         },
         {
-          "command": "contexto.refresh",
+          "command": "contexto.showI18nViewer",
           "when": "view == contexto",
           "group": "navigation@3"
         },
         {
-          "command": "contexto.openConfig",
+          "command": "contexto.refresh",
           "when": "view == contexto",
           "group": "navigation@4"
+        },
+        {
+          "command": "contexto.openConfig",
+          "when": "view == contexto",
+          "group": "navigation@5"
         }
       ],
       "view/item/context": [
@@ -136,13 +146,14 @@
     "clean": "rm -rf out && rm -f *.vsix"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
     "@types/node": "18.x",
+    "@types/vscode": "^1.74.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "fast-glob": "^3.3.2",
     "glob": "^8.1.0",
-    "fast-glob": "^3.3.2"
+    "xlsx": "^0.18.5"
   }
 }

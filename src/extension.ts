@@ -4,6 +4,7 @@ import { ContextoProvider, ContextoStatusProvider } from './treeProvider';
 import { WelcomeWebviewProvider } from './welcomeWebview';
 import { ConfigErrorWebviewProvider } from './configErrorWebview';
 import { StatsWebviewProvider } from './statsWebviewProvider';
+import { I18nViewerWebview } from './i18nViewerWebview';
 import { ProjectStatus } from './types';
 import { Logger } from './logger';
 
@@ -13,6 +14,7 @@ let statusProvider: ContextoStatusProvider;
 let welcomeProvider: WelcomeWebviewProvider;
 let configErrorProvider: ConfigErrorWebviewProvider;
 let statsProvider: StatsWebviewProvider;
+let i18nViewer: I18nViewerWebview;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Contexto插件已激活');
@@ -23,6 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
     welcomeProvider = new WelcomeWebviewProvider(context.extensionUri);
     configErrorProvider = new ConfigErrorWebviewProvider(context.extensionUri);
     statsProvider = new StatsWebviewProvider(context.extensionUri);
+    i18nViewer = new I18nViewerWebview(context.extensionUri);
 
     // 注册tree view
     const treeView = vscode.window.createTreeView('contexto', {
@@ -128,6 +131,7 @@ async function initializeWorkspace() {
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
         statsProvider.setCore(core);
+        i18nViewer.setCore(core);
     } else {
         // 未知状态，为了安全起见，显示配置错误界面
         console.log('未知项目状态，显示配置错误界面');
@@ -366,6 +370,25 @@ const commands = {
 
         } catch (error) {
             vscode.window.showErrorMessage(`导出翻译文件失败：${error}`);
+        }
+    }),
+
+    showI18nViewer: vscode.commands.registerCommand('contexto.showI18nViewer', async () => {
+        if (!core) {
+            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            return;
+        }
+
+        if (core.getProjectStatus() !== ProjectStatus.INITIALIZED) {
+            vscode.window.showErrorMessage('项目配置有误，请先修复配置问题');
+            return;
+        }
+
+        try {
+            i18nViewer.setCore(core);
+            i18nViewer.show();
+        } catch (error) {
+            vscode.window.showErrorMessage(`打开i18n查看器失败：${error}`);
         }
     })
 };
