@@ -26,6 +26,7 @@ export class ContextoCore {
     async initialize(): Promise<boolean> {
         if (!this.configManager.isProjectInitialized()) {
             console.log('项目未初始化');
+            this.projectStatus = ProjectStatus.UNINITIALIZED;
             return false;
         }
 
@@ -34,6 +35,7 @@ export class ContextoCore {
         this.config = await this.configManager.loadConfig();
         if (!this.config) {
             console.log('项目配置加载失败');
+            this.projectStatus = ProjectStatus.CONFIG_ERROR;
             return false;
         }
         console.log('项目配置加载成功:', this.config);
@@ -42,12 +44,8 @@ export class ContextoCore {
         const configValidation = this.validateConfig();
         if (!configValidation.isValid) {
             console.log('配置验证失败:', configValidation.errors);
+            this.projectStatus = ProjectStatus.CONFIG_ERROR;
             return false;
-        }
-
-        // 检查AI服务配置
-        if (!this.config.aiService.apiKey) {
-            vscode.window.showWarningMessage('请在 config.json 中配置 AI 服务的 API 密钥后再使用翻译功能');
         }
 
         // 初始化服务
@@ -61,6 +59,7 @@ export class ContextoCore {
         // 自动执行首次分析
         await this.refreshAnalysis();
 
+        this.projectStatus = ProjectStatus.INITIALIZED;
         return true;
     }
 
@@ -102,23 +101,26 @@ export class ContextoCore {
             }
         }
 
-        // 验证目标语言配置
+        // 验证目标语言配置 - 影响翻译功能
         if (!this.config.targetLangs || this.config.targetLangs.length === 0) {
             warnings.push('targetLangs 配置为空，将无法进行翻译');
         }
 
-        // 验证AI服务配置
+        // 验证AI服务配置 - 这是核心功能，必须配置
         if (!this.config.aiService) {
-            warnings.push('aiService 配置缺失');
+            errors.push('aiService 配置缺失');
         } else {
+            // API密钥是必需的
             if (!this.config.aiService.apiKey) {
-                warnings.push('AI 服务 API 密钥未配置');
+                errors.push('AI 服务 API 密钥未配置，这是插件正常工作的必需配置');
             }
+            // base URL是必需的  
             if (!this.config.aiService.base) {
-                warnings.push('AI 服务 base URL 未配置');
+                errors.push('AI 服务 base URL 未配置，这是插件正常工作的必需配置');
             }
+            // 模型配置是必需的
             if (!this.config.aiService.model) {
-                warnings.push('AI 服务模型未配置');
+                errors.push('AI 服务模型未配置，这是插件正常工作的必需配置');
             }
         }
 
@@ -130,6 +132,19 @@ export class ContextoCore {
         const isValid = errors.length === 0;
         this.configValidation = { isValid, errors, warnings };
         this.projectStatus = isValid ? ProjectStatus.INITIALIZED : ProjectStatus.CONFIG_ERROR;
+
+        // 输出验证结果到控制台
+        if (errors.length > 0) {
+            console.log('配置验证失败，发现以下错误:');
+            errors.forEach(error => console.log(`  ❌ ${error}`));
+        }
+        if (warnings.length > 0) {
+            console.log('配置验证警告:');
+            warnings.forEach(warning => console.log(`  ⚠️ ${warning}`));
+        }
+        if (isValid) {
+            console.log('✅ 配置验证成功');
+        }
 
         return this.configValidation;
     }

@@ -155,35 +155,35 @@ export class WelcomeWebviewProvider implements vscode.WebviewViewProvider {
                     <div class="logo">🌍</div>
                     <div class="title">欢迎使用 Contexto</div>
                     <div class="description">
-                        智能国际化翻译助手，帮助您进行符合业务场景的本土化翻译
+                        专为软件工程师打造的免费UI文案本土化工具，让您的应用文案更贴近目标用户的表达习惯
                     </div>
                     
                     <div class="features">
                         <div class="feature">
                             <span class="feature-icon">🎯</span>
-                            <span>基于上下文的智能翻译</span>
+                            <span>针对UI场景的本土化表达，而非直译</span>
                         </div>
                         <div class="feature">
                             <span class="feature-icon">🤖</span>
-                            <span>AI 驱动的翻译建议</span>
+                            <span>AI理解业务场景，提供准确自然的文案</span>
                         </div>
                         <div class="feature">
-                            <span class="feature-icon">📊</span>
-                            <span>可视化翻译进度管理</span>
+                            <span class="feature-icon">✨</span>
+                            <span>符合目标语种用户习惯的语法和表达</span>
                         </div>
                         <div class="feature">
-                            <span class="feature-icon">🔄</span>
-                            <span>自动检测文本变更</span>
+                            <span class="feature-icon">🆓</span>
+                            <span>完全免费，专注开发体验</span>
                         </div>
                     </div>
 
                     <button class="init-button" onclick="initProject()">
                         <span class="button-icon">🚀</span>
-                        <span>初始化 Contexto 项目</span>
+                        <span>开始本土化之旅</span>
                     </button>
                     
                     <div class="hint">
-                        初始化后，您将可以配置 AI 服务并开始翻译工作
+                        配置您的AI服务，让软件文案更贴近用户心声
                     </div>
                 </div>
 

@@ -37,9 +37,6 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
                 case 'refresh':
                     vscode.commands.executeCommand('contexto.refresh');
                     break;
-                case 'createSourceDict':
-                    this.createSourceDictionary();
-                    break;
             }
         });
     }
@@ -54,39 +51,6 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
         if (this._view) {
             this._configValidation = this._core?.getConfigValidation() || null;
             this._view.webview.html = this._getHtmlForWebview(this._view.webview);
-        }
-    }
-
-    private async createSourceDictionary() {
-        if (!this._core) return;
-
-        const config = this._core.getConfig();
-        if (!config?.sourceLangDict) return;
-
-        try {
-            const workspaceRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-            if (!workspaceRoot) return;
-
-            const sourceDictPath = path.resolve(workspaceRoot, config.sourceLangDict);
-            const sourceDictDir = path.dirname(sourceDictPath);
-
-            // 创建目录（如果不存在）
-            if (!fs.existsSync(sourceDictDir)) {
-                fs.mkdirSync(sourceDictDir, { recursive: true });
-            }
-
-            // 创建空的JSON文件
-            const emptyDict = {};
-            fs.writeFileSync(sourceDictPath, JSON.stringify(emptyDict, null, 2), 'utf-8');
-
-            vscode.window.showInformationMessage(`已创建源语言字典文件: ${config.sourceLangDict}`);
-            
-            // 刷新状态
-            await this._core.initialize();
-            vscode.commands.executeCommand('contexto.refresh');
-
-        } catch (error) {
-            vscode.window.showErrorMessage(`创建源语言字典文件失败: ${error}`);
         }
     }
 
@@ -201,11 +165,6 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
                     .action-button.secondary:hover {
                         background: var(--vscode-button-secondaryHoverBackground);
                     }
-                    .create-button {
-                        background: var(--vscode-inputValidation-infoBackground);
-                        color: var(--vscode-inputValidation-infoForeground);
-                        border: 1px solid var(--vscode-inputValidation-infoBorder);
-                    }
                     .create-button:hover {
                         opacity: 0.9;
                     }
@@ -221,13 +180,6 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
             </head>
             <body>
                 <div class="error-container">
-                    <div class="title">
-                        <span>⚠️</span>
-                        <span>配置异常</span>
-                    </div>
-                    <div class="subtitle">
-                        Contexto 检测到配置文件存在问题，请修复后继续使用
-                    </div>
 
                     ${errors.length > 0 ? `
                     <div class="issue-section">
@@ -259,13 +211,6 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
                             <span>打开配置文件</span>
                         </button>
                         
-                        ${this.shouldShowCreateButton() ? `
-                        <button class="action-button create-button" onclick="createSourceDict()">
-                            <span>📁</span>
-                            <span>创建源语言字典文件</span>
-                        </button>
-                        ` : ''}
-                        
                         <button class="action-button secondary" onclick="refresh()">
                             <span>🔄</span>
                             <span>重新检测配置</span>
@@ -291,20 +236,8 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
                     function refresh() {
                         vscode.postMessage({ type: 'refresh' });
                     }
-                    
-                    function createSourceDict() {
-                        vscode.postMessage({ type: 'createSourceDict' });
-                    }
                 </script>
             </body>
             </html>`;
-    }
-
-    private shouldShowCreateButton(): boolean {
-        if (!this._configValidation?.errors) return false;
-        
-        return this._configValidation.errors.some(error => 
-            error.includes('源语言字典文件不存在')
-        );
     }
 }

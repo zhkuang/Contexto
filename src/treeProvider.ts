@@ -182,12 +182,12 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         if (elements.length === 0) {
             return [
                 new WelcomeItem(''),
-                new WelcomeItem('🎉 太棒了！所有翻译都已完成'),
+                new WelcomeItem('所有翻译都已完成'),
                 new WelcomeItem(''),
-                new WelcomeItem('✅ 当前项目没有待处理的翻译任务'),
-                new WelcomeItem('📝 继续开发，我们会自动检测新的翻译需求'),
+                new WelcomeItem('当前项目没有待处理的翻译任务'),
+                new WelcomeItem('继续开发，我们会自动检测新的翻译需求'),
                 new WelcomeItem(''),
-                new WelcomeItem('💡 提示：修改代码中的文本时，刷新即可看到新的翻译任务')
+                new WelcomeItem('提示：修改代码中的文本时，刷新即可看到新的翻译任务')
             ];
         }
 

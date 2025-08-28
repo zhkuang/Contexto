@@ -93,8 +93,10 @@ async function initializeWorkspace() {
     const workspaceRoot = workspaceFolders[0].uri.fsPath;
     core = new ContextoCore(workspaceRoot);
 
+    // 1. 首先检查是否初始化过
     if (!core.isInitialized()) {
         // 项目未初始化，显示欢迎界面
+        console.log('项目未初始化，显示欢迎界面');
         await setViewVisibility('welcome');
         welcomeProvider.setCore(core);
         await treeProvider.setCore(core);
@@ -103,27 +105,34 @@ async function initializeWorkspace() {
         return;
     }
 
-    // 项目已初始化，尝试加载配置
+    // 2. 项目已初始化，检查配置文件是否正确
+    console.log('项目已初始化，开始验证配置...');
     const initialized = await core.initialize();
     const projectStatus = core.getProjectStatus();
     
     if (projectStatus === ProjectStatus.CONFIG_ERROR) {
-        // 配置有错误，显示配置错误界面
+        // 配置有错误，必须显示配置错误界面
+        console.log('配置验证失败，显示配置错误界面');
         await setViewVisibility('configError');
         configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
-    } else if (projectStatus === ProjectStatus.INITIALIZED) {
-        // 配置正确，显示翻译管理界面
+        return;
+    }
+    
+    if (projectStatus === ProjectStatus.INITIALIZED) {
+        // 只有当配置完全正确时，才能进入翻译管理界面
+        console.log('配置验证成功，显示翻译管理界面');
         await setViewVisibility('translationManager');
         await treeProvider.setCore(core);
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
         statsProvider.setCore(core);
     } else {
-        // 未知状态，默认显示翻译管理界面
-        await setViewVisibility('translationManager');
-        await treeProvider.setCore(core);
+        // 未知状态，为了安全起见，显示配置错误界面
+        console.log('未知项目状态，显示配置错误界面');
+        await setViewVisibility('configError');
+        configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
     }
@@ -167,32 +176,31 @@ const commands = {
     refresh: vscode.commands.registerCommand('contexto.refresh', async () => {
         console.log('执行刷新命令...');
         
-        if (!core) {
-            console.log('core不存在，重新初始化工作区');
-            await initializeWorkspace();
-            return;
-        }
+        // 刷新命令也要执行完整的初始化检查流程
+        await initializeWorkspace();
         
-        if (!core.isInitialized()) {
-            console.log('项目未初始化，重新初始化工作区');
-            await initializeWorkspace();
-            return;
-        }
-        
-        try {
-            console.log('开始刷新分析数据...');
-            // 重新分析键值
-            await treeProvider.updateAnalysis();
-            
-            // 更新状态栏
-            const analysis = treeProvider.getAnalysis();
-            statusProvider.updateStatus(core, analysis);
-            
-            console.log('刷新完成');
-            vscode.window.showInformationMessage('Contexto: 刷新完成');
-        } catch (error) {
-            console.error('刷新失败:', error);
-            vscode.window.showErrorMessage(`刷新失败：${error}`);
+        // 如果项目初始化且配置正确，才执行分析刷新
+        if (core && core.getProjectStatus() === ProjectStatus.INITIALIZED) {
+            try {
+                console.log('开始刷新分析数据...');
+                // 重新分析键值
+                await treeProvider.updateAnalysis();
+                
+                // 更新状态栏
+                const analysis = treeProvider.getAnalysis();
+                statusProvider.updateStatus(core, analysis);
+                
+                // 刷新统计面板
+                statsProvider.refresh();
+                
+                console.log('刷新完成');
+                vscode.window.showInformationMessage('Contexto: 刷新完成');
+            } catch (error) {
+                console.error('刷新失败:', error);
+                vscode.window.showErrorMessage(`刷新失败：${error}`);
+            }
+        } else {
+            console.log('项目未正确初始化或配置有误，刷新仅完成状态检查');
         }
     }),
 
@@ -207,6 +215,9 @@ const commands = {
             await treeProvider.updateAnalysis();
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
+            
+            // 刷新统计面板
+            statsProvider.refresh();
         } catch (error) {
             vscode.window.showErrorMessage(`文本清理失败：${error}`);
         }
@@ -223,6 +234,9 @@ const commands = {
             await treeProvider.updateAnalysis();
             const analysis = treeProvider.getAnalysis();
             statusProvider.updateStatus(core, analysis);
+            
+            // 刷新统计面板
+            statsProvider.refresh();
         } catch (error) {
             vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
         }

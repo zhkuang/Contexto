@@ -45,6 +45,13 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
         this._updateWebview();
     }
 
+    /**
+     * 刷新统计数据
+     */
+    public refresh() {
+        this._updateWebview();
+    }
+
     private _updateWebview() {
         if (this._view) {
             this._view.webview.html = this._getHtmlForWebview();
