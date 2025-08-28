@@ -346,12 +346,12 @@ export class ConfigWebviewProvider {
     <style>
         body {
             font-family: var(--vscode-font-family);
-            font-size: var(--vscode-font-size);
+            font-size: 13px;
             color: var(--vscode-foreground);
             background-color: var(--vscode-editor-background);
-            padding: 20px;
+            padding: 16px 24px;
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .container {
@@ -359,56 +359,94 @@ export class ConfigWebviewProvider {
             margin: 0 auto;
         }
 
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--vscode-editor-widget-background);
-            border-radius: 6px;
-            border: 1px solid var(--vscode-widget-border);
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: var(--vscode-titleBar-activeForeground);
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 24px 0;
+            color: var(--vscode-foreground);
             border-bottom: 1px solid var(--vscode-widget-border);
             padding-bottom: 8px;
         }
 
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--vscode-foreground);
+            padding: 0;
+            border: none;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .form-group::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: transparent;
+            transition: background-color 0.15s ease;
+        }
+
+        .form-group:focus-within::before {
+            background-color: var(--vscode-focusBorder);
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--vscode-input-foreground);
+            margin-bottom: 4px;
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--vscode-foreground);
+            cursor: pointer;
+        }
+
+        .form-label:hover {
+            color: var(--vscode-foreground);
         }
 
         .form-description {
             font-size: 12px;
             color: var(--vscode-descriptionForeground);
-            margin-bottom: 8px;
-            line-height: 1.4;
+            margin-bottom: 6px;
+            line-height: 1.3;
         }
 
-        .form-input {
+        .form-input, select {
             width: 100%;
-            padding: 8px 12px;
+            height: 26px;
+            padding: 4px 8px;
             background-color: var(--vscode-input-background);
             color: var(--vscode-input-foreground);
             border: 1px solid var(--vscode-input-border);
-            border-radius: 3px;
+            border-radius: 2px;
             font-family: var(--vscode-font-family);
-            font-size: var(--vscode-font-size);
+            font-size: 13px;
             box-sizing: border-box;
+            transition: all 0.15s ease;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        .form-input:focus {
+        .form-input:focus, select:focus {
             outline: none;
             border-color: var(--vscode-focusBorder);
+            background-color: var(--vscode-input-background);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--vscode-focusBorder);
+        }
+
+        .form-input:hover:not(:read-only):not(:focus), select:hover:not(:focus) {
+            border-color: var(--vscode-input-border);
+            background-color: var(--vscode-input-background);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
         .form-input.error {
@@ -416,10 +454,22 @@ export class ConfigWebviewProvider {
             background-color: var(--vscode-inputValidation-errorBackground);
         }
 
+        .form-input:read-only {
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.8;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .form-input:read-only:hover {
+            box-shadow: none;
+        }
+
         .input-group {
             display: flex;
-            gap: 8px;
-            align-items: center;
+            gap: 6px;
+            align-items: stretch;
         }
 
         .input-group .form-input {
@@ -427,29 +477,45 @@ export class ConfigWebviewProvider {
         }
 
         .btn {
-            padding: 8px 16px;
+            height: 26px;
+            padding: 0 12px;
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            border: none;
-            border-radius: 3px;
+            border: 1px solid var(--vscode-button-border);
+            border-radius: 2px;
             cursor: pointer;
             font-family: var(--vscode-font-family);
-            font-size: var(--vscode-font-size);
-            transition: background-color 0.2s;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .btn:hover {
             background-color: var(--vscode-button-hoverBackground);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-secondary {
             background-color: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
+            border-color: var(--vscode-button-border);
         }
 
         .btn-secondary:hover {
@@ -457,24 +523,48 @@ export class ConfigWebviewProvider {
         }
 
         .btn-danger {
+            background-color: var(--vscode-inputValidation-errorBackground);
+            color: var(--vscode-inputValidation-errorForeground);
+            border-color: var(--vscode-inputValidation-errorBorder);
+        }
+
+        .btn-danger:hover {
             background-color: var(--vscode-inputValidation-errorBorder);
             color: var(--vscode-button-foreground);
         }
 
         .btn-small {
-            padding: 4px 8px;
-            font-size: 12px;
+            height: 22px;
+            padding: 0 8px;
+            font-size: 11px;
+        }
+
+        .settings-group {
+            background-color: var(--vscode-editor-background);
+            padding: 0;
+            margin-bottom: 0;
         }
 
         .target-lang-item {
             display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 12px;
-            background-color: var(--vscode-input-background);
-            border: 1px solid var(--vscode-input-border);
+            gap: 6px;
+            align-items: stretch;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: var(--vscode-editor-background);
+            border: 1px solid transparent;
             border-radius: 3px;
+            transition: all 0.15s ease;
+        }
+
+        .target-lang-item:hover {
+            background-color: var(--vscode-list-hoverBackground);
+            border-color: var(--vscode-input-border);
+        }
+
+        .target-lang-item:focus-within {
+            background-color: var(--vscode-list-focusBackground);
+            border-color: var(--vscode-focusBorder);
         }
 
         .target-lang-item .form-input {
@@ -484,13 +574,49 @@ export class ConfigWebviewProvider {
 
         .ignore-item {
             display: flex;
-            gap: 8px;
-            align-items: center;
+            gap: 6px;
+            align-items: stretch;
             margin-bottom: 8px;
+            padding: 8px;
+            background: var(--vscode-editor-background);
+            border: 1px solid transparent;
+            border-radius: 3px;
+            transition: all 0.15s ease;
+        }
+
+        .ignore-item:hover {
+            background-color: var(--vscode-list-hoverBackground);
+            border-color: var(--vscode-input-border);
+        }
+
+        .ignore-item:focus-within {
+            background-color: var(--vscode-list-focusBackground);
+            border-color: var(--vscode-focusBorder);
         }
 
         .ignore-item .form-input {
             flex: 1;
+        }
+
+        .list-container {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-bottom: 8px;
+        }
+
+        .list-container:empty {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .list-container:empty::after {
+            content: '暂无配置项';
         }
 
         .error-message {
@@ -498,7 +624,7 @@ export class ConfigWebviewProvider {
             background-color: var(--vscode-inputValidation-errorBackground);
             border: 1px solid var(--vscode-inputValidation-errorBorder);
             padding: 8px 12px;
-            border-radius: 3px;
+            border-radius: 2px;
             margin-top: 8px;
             font-size: 12px;
         }
@@ -508,17 +634,17 @@ export class ConfigWebviewProvider {
             background-color: var(--vscode-editor-background);
             border: 1px solid var(--vscode-terminal-ansiGreen);
             padding: 8px 12px;
-            border-radius: 3px;
+            border-radius: 2px;
             margin-top: 8px;
             font-size: 12px;
         }
 
         .actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 24px;
+            padding-top: 16px;
             border-top: 1px solid var(--vscode-widget-border);
         }
 
@@ -528,9 +654,9 @@ export class ConfigWebviewProvider {
         }
 
         .test-result {
-            margin-top: 8px;
-            padding: 8px 12px;
-            border-radius: 3px;
+            margin-top: 6px;
+            padding: 6px 8px;
+            border-radius: 2px;
             font-size: 12px;
         }
 
@@ -549,6 +675,27 @@ export class ConfigWebviewProvider {
         .required {
             color: var(--vscode-inputValidation-errorForeground);
         }
+
+        .add-button-container {
+            margin-top: 8px;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        /* 移除过多的焦点样式 */
+        .target-lang-item:focus-within,
+        .ignore-item:focus-within {
+            /* 移除额外边框 */
+        }
+
+        /* 简化空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 12px;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -563,7 +710,7 @@ export class ConfigWebviewProvider {
                 <div class="form-description">指定包含原始文本的语言字典文件，支持 JSON 格式</div>
                 <div class="input-group">
                     <input type="text" id="sourceLangDict" class="form-input" placeholder="./locales/zh-CN.json" readonly />
-                    <button class="btn btn-secondary" onclick="selectSourceDict()">选择文件</button>
+                    <button class="btn btn-secondary" onclick="selectSourceDict()">浏览</button>
                 </div>
             </div>
         </div>
@@ -572,56 +719,62 @@ export class ConfigWebviewProvider {
             <div class="section-title">目标语言配置</div>
             <div class="form-description">配置需要翻译到的目标语言。可以只指定语言代码（使用默认路径），也可以选择现有文件或目录</div>
             
-            <div id="targetLangsContainer">
+            <div class="list-container" id="targetLangsContainer">
                 <!-- 目标语言项将通过 JavaScript 动态生成 -->
             </div>
             
-            <button class="btn btn-secondary" onclick="addTargetLang()">+ 添加目标语言</button>
+            <div class="add-button-container">
+                <button class="btn btn-secondary" onclick="addTargetLang()">+ 添加目标语言</button>
+            </div>
         </div>
 
         <div class="section">
             <div class="section-title">忽略路径配置</div>
             <div class="form-description">指定在扫描源代码时需要忽略的文件或目录路径</div>
             
-            <div id="ignoreContainer">
+            <div class="list-container" id="ignoreContainer">
                 <!-- 忽略路径项将通过 JavaScript 动态生成 -->
             </div>
             
-            <button class="btn btn-secondary" onclick="addIgnorePath()">+ 添加忽略路径</button>
+            <div class="add-button-container">
+                <button class="btn btn-secondary" onclick="addIgnorePath()">+ 添加忽略路径</button>
+            </div>
         </div>
 
         <div class="section">
             <div class="section-title">AI 服务配置</div>
             
-            <div class="form-group">
-                <label class="form-label">服务类型 <span class="required">*</span></label>
-                <div class="form-description">选择要使用的 AI 翻译服务类型</div>
-                <select id="aiServiceType" class="form-input">
-                    <option value="openai">OpenAI</option>
-                </select>
-            </div>
+            <div class="settings-group">
+                <div class="form-group">
+                    <label class="form-label">服务类型 <span class="required">*</span></label>
+                    <div class="form-description">选择要使用的 AI 翻译服务类型</div>
+                    <select id="aiServiceType" class="form-input">
+                        <option value="openai">OpenAI</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">API Key <span class="required">*</span></label>
-                <div class="form-description">您的 AI 服务 API 密钥</div>
-                <input type="password" id="apiKey" class="form-input" placeholder="sk-..." />
-            </div>
+                <div class="form-group">
+                    <label class="form-label">API Key <span class="required">*</span></label>
+                    <div class="form-description">您的 AI 服务 API 密钥</div>
+                    <input type="password" id="apiKey" class="form-input" placeholder="sk-..." />
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">API 基础地址 <span class="required">*</span></label>
-                <div class="form-description">AI 服务的 API 基础 URL 地址</div>
-                <input type="text" id="apiBase" class="form-input" placeholder="https://api.openai.com/v1" />
-            </div>
+                <div class="form-group">
+                    <label class="form-label">API 基础地址 <span class="required">*</span></label>
+                    <div class="form-description">AI 服务的 API 基础 URL 地址</div>
+                    <input type="text" id="apiBase" class="form-input" placeholder="https://api.openai.com/v1" />
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">模型名称 <span class="required">*</span></label>
-                <div class="form-description">使用的 AI 模型名称</div>
-                <input type="text" id="model" class="form-input" placeholder="gpt-4" />
-            </div>
+                <div class="form-group">
+                    <label class="form-label">模型名称 <span class="required">*</span></label>
+                    <div class="form-description">使用的 AI 模型名称</div>
+                    <input type="text" id="model" class="form-input" placeholder="gpt-4" />
+                </div>
 
-            <div class="form-group">
-                <button class="btn btn-secondary" onclick="testAIService()" id="testBtn">测试连接</button>
-                <div id="testResult"></div>
+                <div class="form-group">
+                    <button class="btn btn-secondary" onclick="testAIService()" id="testBtn">测试连接</button>
+                    <div id="testResult"></div>
+                </div>
             </div>
         </div>
 
@@ -759,6 +912,12 @@ export class ConfigWebviewProvider {
             const container = document.getElementById('targetLangsContainer');
             const index = container.children.length;
             
+            // 移除空状态
+            if (container.classList.contains('empty-state')) {
+                container.classList.remove('empty-state');
+                container.innerHTML = '';
+            }
+            
             const item = document.createElement('div');
             item.className = 'target-lang-item';
             item.innerHTML = \`
@@ -767,7 +926,7 @@ export class ConfigWebviewProvider {
                        onchange="updateOutputPathForLang(\${index})" />
                 <input type="text" class="form-input" placeholder="输出路径 (可选，默认: ./contexto/locales/[lang].json)" 
                        value="\${outputPath}" id="targetLang_\${index}_path" readonly />
-                <button class="btn btn-secondary btn-small" onclick="selectOutputPath(\${index})" title="选择输出文件或目录">选择路径</button>
+                <button class="btn btn-secondary btn-small" onclick="selectOutputPath(\${index})" title="选择输出文件或目录">浏览</button>
                 <button class="btn btn-danger btn-small" onclick="removeTargetLang(\${index})">删除</button>
             \`;
             
@@ -812,6 +971,13 @@ export class ConfigWebviewProvider {
                     if (selectBtn) selectBtn.setAttribute('onclick', \`selectOutputPath(\${newIndex})\`);
                     if (removeBtn) removeBtn.setAttribute('onclick', \`removeTargetLang(\${newIndex})\`);
                 });
+            } else {
+                // 如果删除后没有项目了，显示空状态
+                container.children[index].remove();
+                if (container.children.length === 0) {
+                    container.classList.add('empty-state');
+                    container.innerHTML = '';
+                }
             }
         }
 
@@ -822,6 +988,12 @@ export class ConfigWebviewProvider {
         function addIgnorePathItem(path = '') {
             const container = document.getElementById('ignoreContainer');
             const index = container.children.length;
+            
+            // 移除空状态
+            if (container.classList.contains('empty-state')) {
+                container.classList.remove('empty-state');
+                container.innerHTML = '';
+            }
             
             const item = document.createElement('div');
             item.className = 'ignore-item';
@@ -846,6 +1018,12 @@ export class ConfigWebviewProvider {
                     if (input) input.id = \`ignore_\${newIndex}\`;
                     if (button) button.setAttribute('onclick', \`removeIgnorePath(\${newIndex})\`);
                 });
+                
+                // 如果删除后没有项目了，显示空状态
+                if (container.children.length === 0) {
+                    container.classList.add('empty-state');
+                    container.innerHTML = '';
+                }
             }
         }
 
@@ -856,6 +1034,7 @@ export class ConfigWebviewProvider {
             // 填充目标语言
             const targetLangsContainer = document.getElementById('targetLangsContainer');
             targetLangsContainer.innerHTML = '';
+            targetLangsContainer.classList.remove('empty-state');
             
             if (config.targetLangs && config.targetLangs.length > 0) {
                 config.targetLangs.forEach(lang => {
@@ -872,6 +1051,7 @@ export class ConfigWebviewProvider {
             // 填充忽略路径
             const ignoreContainer = document.getElementById('ignoreContainer');
             ignoreContainer.innerHTML = '';
+            ignoreContainer.classList.remove('empty-state');
             
             if (config.ignore && config.ignore.length > 0) {
                 config.ignore.forEach(path => {
