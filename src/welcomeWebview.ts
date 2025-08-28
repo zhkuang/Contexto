@@ -155,36 +155,32 @@ export class WelcomeWebviewProvider implements vscode.WebviewViewProvider {
                     <div class="logo">🌍</div>
                     <div class="title">欢迎使用 Contexto</div>
                     <div class="description">
-                        专为软件工程师打造的免费UI文案本土化工具，让您的应用文案更贴近目标用户的表达习惯
+                        专业的软件国际化解决方案，告别机械化翻译，实现真正符合用户习惯的本土化表达
                     </div>
                     
                     <div class="features">
                         <div class="feature">
-                            <span class="feature-icon">🎯</span>
-                            <span>针对UI场景的本土化表达，而非直译</span>
+                            <span class="feature-icon">🎭 </span>
+                            <span>告别书面化翻译，生成符合真实使用场景的文案</span>
                         </div>
                         <div class="feature">
-                            <span class="feature-icon">🤖</span>
-                            <span>AI理解业务场景，提供准确自然的文案</span>
+                            <span class="feature-icon">🧠 </span>
+                            <span>AI理解UI上下文，提供本土化自然表达</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🎯</span>
+                            <span>专为UI界面优化，契合交互场景的文案风格</span>
                         </div>
                         <div class="feature">
                             <span class="feature-icon">✨</span>
-                            <span>符合目标语种用户习惯的语法和表达</span>
-                        </div>
-                        <div class="feature">
-                            <span class="feature-icon">🆓</span>
-                            <span>完全免费，专注开发体验</span>
+                            <span>可视化界面操作，简单易用</span>
                         </div>
                     </div>
 
                     <button class="init-button" onclick="initProject()">
-                        <span class="button-icon">🚀</span>
-                        <span>开始本土化之旅</span>
+                        <span>配置项目</span>
                     </button>
                     
-                    <div class="hint">
-                        配置您的AI服务，让软件文案更贴近用户心声
-                    </div>
                 </div>
 
                 <script>

@@ -1,14 +1,18 @@
 {
-    "sourceLangDict": "zh-CN.json",
+    "sourceLangDict": "./locales/zh-CN.json",
     "targetLangs": [
-        {
-            "lang": "en",
-            "outputPath": "./locales/en.json"
-        },
-        {
-            "lang": "zh-TW",
-            "outputPath": "./locales/zh-TW.json"
-        }
+        "en",
+        "zh-TW",
+        "ja",
+        "ko",
+        "fr",
+        "de",
+        "es",
+        "pt",
+        "ru",
+        "ar",
+        "th",
+        "vi"
     ],
     "ignore": [
         "./contexto",
@@ -17,8 +21,8 @@
     ],
     "aiService": {
         "type": "openai",
-        "apiKey": "sk-vl80TDuDmHwPHArAZobIbRtN3TXniuZ22fHdnt60dBct1TKk",
-        "base": "https://api.chatanywhere.tech/v1",
-        "model": "gpt-4.1-mini"
+        "apiKey": "",
+        "base": "https://api.openai.com/v1",
+        "model": "gpt-4"
     }
 }
