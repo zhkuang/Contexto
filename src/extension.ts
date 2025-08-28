@@ -3,6 +3,7 @@ import { ContextoCore } from './contextoCore';
 import { ContextoProvider, ContextoStatusProvider } from './treeProvider';
 import { WelcomeWebviewProvider } from './welcomeWebview';
 import { ConfigErrorWebviewProvider } from './configErrorWebview';
+import { ConfigWebviewProvider } from './configWebview';
 import { StatsWebviewProvider } from './statsWebviewProvider';
 import { I18nViewerWebview } from './i18nViewerWebview';
 import { ProjectStatus } from './types';
@@ -13,6 +14,7 @@ let treeProvider: ContextoProvider;
 let statusProvider: ContextoStatusProvider;
 let welcomeProvider: WelcomeWebviewProvider;
 let configErrorProvider: ConfigErrorWebviewProvider;
+let configProvider: ConfigWebviewProvider;
 let statsProvider: StatsWebviewProvider;
 let i18nViewer: I18nViewerWebview;
 
@@ -24,6 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     statusProvider = new ContextoStatusProvider();
     welcomeProvider = new WelcomeWebviewProvider(context.extensionUri);
     configErrorProvider = new ConfigErrorWebviewProvider(context.extensionUri);
+    configProvider = new ConfigWebviewProvider(context.extensionUri);
     statsProvider = new StatsWebviewProvider(context.extensionUri);
     i18nViewer = new I18nViewerWebview(context.extensionUri);
 
@@ -90,6 +93,7 @@ async function initializeWorkspace() {
         statusProvider.updateStatus(null, null);
         await treeProvider.setCore(null);
         statsProvider.setCore(null);
+        configProvider.setCore(null);
         return;
     }
 
@@ -105,6 +109,7 @@ async function initializeWorkspace() {
         await treeProvider.setCore(core);
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
+        configProvider.setCore(core);
         return;
     }
 
@@ -120,6 +125,7 @@ async function initializeWorkspace() {
         configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
+        configProvider.setCore(core);
         return;
     }
     
@@ -131,6 +137,7 @@ async function initializeWorkspace() {
         const analysis = treeProvider.getAnalysis();
         statusProvider.updateStatus(core, analysis);
         statsProvider.setCore(core);
+        configProvider.setCore(core);
         i18nViewer.setCore(core);
     } else {
         // 未知状态，为了安全起见，显示配置错误界面
@@ -139,6 +146,7 @@ async function initializeWorkspace() {
         configErrorProvider.setCore(core);
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
+        configProvider.setCore(core);
     }
 }
 
@@ -280,11 +288,10 @@ const commands = {
         }
 
         try {
-            const configPath = core.getConfigPath();
-            const doc = await vscode.workspace.openTextDocument(configPath);
-            await vscode.window.showTextDocument(doc);
+            configProvider.setCore(core);
+            configProvider.show();
         } catch (error) {
-            vscode.window.showErrorMessage(`配置文件打开失败：${error}`);
+            vscode.window.showErrorMessage(`打开配置页面失败：${error}`);
         }
     }),
 
