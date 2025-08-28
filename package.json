@@ -67,7 +67,7 @@
       },
       {
         "command": "contexto.translateKeys",
-        "title": "一键翻译",
+        "title": "翻译",
         "icon": "$(globe)"
       },
       {
@@ -77,7 +77,7 @@
       },
       {
         "command": "contexto.showI18nViewer",
-        "title": "查看i18n数据",
+        "title": "翻译工作台",
         "icon": "$(table)"
       },
       {
@@ -87,12 +87,12 @@
       },
       {
         "command": "contexto.refreshStats",
-        "title": "刷新统计数据",
+        "title": "刷新",
         "icon": "$(refresh)"
       },
       {
         "command": "contexto.openConfig",
-        "title": "打开配置",
+        "title": "配置",
         "icon": "$(gear)"
       },
       {

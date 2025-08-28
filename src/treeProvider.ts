@@ -189,10 +189,7 @@ export class ContextoProvider implements vscode.TreeDataProvider<KeyTreeItem | I
         // Show empty state message if no translation tasks
         if (elements.length === 0) {
             return [
-                new WelcomeItem(''),
-                new WelcomeItem('所有翻译已同步', true),
-                new WelcomeItem(''),
-                new WelcomeItem('修改代码文本后刷新查看新任务', true)
+                new WelcomeItem('未发现需要翻译的内容，如有修改可刷新查看', true),
             ];
         }
 

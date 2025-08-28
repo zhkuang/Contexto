@@ -303,7 +303,7 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                         <span class="stat-value highlight">${stats.originalKeysCount}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">废弃Key数量</span>
+                        <span class="stat-label">未使用Key数量</span>
                         <span class="stat-value ${stats.unusedKeysCount > 0 ? 'warning' : ''}">${stats.unusedKeysCount}</span>
                     </div>
                 </div>
