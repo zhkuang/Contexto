@@ -34,24 +34,13 @@ export class ConfigManager {
 
         // 创建默认配置
         const defaultConfig: ContextoConfig = {
-            sourceLangDict: "./locales/zh-CN.json",
+            sourceLangDict: "",
             targetLangs: [
                 "en",           // 英语
-                "zh-TW",        // 繁体中文
-                "ja",           // 日语
-                "ko",           // 韩语
-                "fr",           // 法语
-                "de",           // 德语
-                "es",           // 西班牙语
-                "pt",           // 葡萄牙语
-                "ru",           // 俄语
-                "ar",           // 阿拉伯语
-                "th",           // 泰语
-                "vi"            // 越南语
                 // 也可以使用对象格式：
                 // { lang: "en", outputPath: "./locales/en.json" }
             ],
-            ignore: ["./contexto", "./node_modules", "./.git"],
+            ignore: ["./contexto", "./node_modules", "./.git", "./.vscode"],
             aiService: {
                 type: "openai",
                 apiKey: "",
