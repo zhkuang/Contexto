@@ -173,12 +173,9 @@ const commands = {
             // 重新检查项目状态
             await initializeWorkspace();
             
-            // 打开配置文件让用户配置
-            const configPath = core.getConfigPath();
-            const doc = await vscode.workspace.openTextDocument(configPath);
-            await vscode.window.showTextDocument(doc);
-            
-            vscode.window.showInformationMessage('项目初始化完成！请配置 AI 服务信息和源语言字典路径，保存后将自动检测配置。');
+            // 打开配置面板让用户配置
+            configProvider.setCore(core);
+            configProvider.show();
             
         } catch (error) {
             vscode.window.showErrorMessage(`项目初始化失败：${error}`);
