@@ -208,6 +208,33 @@ const commands = {
         }
     }),
 
+    refreshStats: vscode.commands.registerCommand('contexto.refreshStats', async () => {
+        console.log('执行统计数据刷新命令...');
+        
+        if (core && core.getProjectStatus() === ProjectStatus.INITIALIZED) {
+            try {
+                console.log('开始刷新统计数据...');
+                // 重新分析键值
+                await treeProvider.updateAnalysis();
+                
+                // 更新状态栏
+                const analysis = treeProvider.getAnalysis();
+                statusProvider.updateStatus(core, analysis);
+                
+                // 刷新统计面板
+                statsProvider.refresh();
+                
+                console.log('统计数据刷新完成');
+                vscode.window.showInformationMessage('统计数据已刷新');
+            } catch (error) {
+                console.error('统计数据刷新失败:', error);
+                vscode.window.showErrorMessage(`统计数据刷新失败：${error}`);
+            }
+        } else {
+            vscode.window.showWarningMessage('项目未初始化或配置有误，无法刷新统计数据');
+        }
+    }),
+
     deleteKeys: vscode.commands.registerCommand('contexto.deleteKeys', async () => {
         if (!core) {
             vscode.window.showErrorMessage('Contexto 项目尚未初始化');
@@ -293,24 +320,24 @@ const commands = {
         }
 
         try {
-            // 1. 检查是否有可导出的数据
+            // 1. 检查是否有可同步的数据
             if (!core.hasExportableData()) {
-                vscode.window.showWarningMessage('没有可导出的翻译数据，请先执行翻译操作');
+                vscode.window.showWarningMessage('没有可同步的翻译数据，请先执行翻译操作');
                 return;
             }
 
-            // 2. 获取导出预览
+            // 2. 获取同步预览
             const exportFiles = core.getExportPreview();
             if (exportFiles.length === 0) {
                 vscode.window.showWarningMessage('目标语种配置为空，请检查 config.json 中的 targetLangs 配置');
                 return;
             }
 
-            // 3. 让用户选择导出策略
+            // 3. 让用户选择同步策略
             const strategyChoice = await vscode.window.showQuickPick([
                 {
-                    label: '仅导出已翻译内容 (推荐)',
-                    description: '只导出已有翻译的键，避免混合语言',
+                    label: '仅同步已翻译内容 (推荐)',
+                    description: '只同步已有翻译的键，避免混合语言',
                     detail: 'skip',
                 },
                 {
@@ -319,32 +346,32 @@ const commands = {
                     detail: 'source',
                 }
             ], {
-                placeHolder: '选择导出策略',
-                title: '导出翻译文件'
+                placeHolder: '选择同步策略',
+                title: '同步翻译到语言文件'
             });
 
             if (!strategyChoice) {
                 return; // 用户取消
             }
 
-            // 4. 显示导出预览，询问用户确认
+            // 4. 显示同步预览，询问用户确认
             const fileList = exportFiles.map(file => `• ${file}`).join('\n');
-            const confirmMessage = `即将导出翻译文件到以下位置：\n\n${fileList}\n\n策略: ${strategyChoice.label}\n\n注意：这将覆盖已存在的文件。`;
+            const confirmMessage = `即将同步翻译内容到以下文件：\n\n${fileList}\n\n策略: ${strategyChoice.label}\n\n注意：这将覆盖已存在的文件。`;
             
             const choice = await vscode.window.showInformationMessage(
                 confirmMessage,
                 { modal: true },
-                '确认导出'
+                '确认同步'
             );
 
-            if (choice !== '确认导出') {
+            if (choice !== '确认同步') {
                 return;
             }
 
-            // 5. 执行导出
+            // 5. 执行同步
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: "正在导出翻译文件...",
+                title: "正在同步翻译到语言文件...",
                 cancellable: false
             }, async (progress) => {
                 if (!core) {
@@ -356,7 +383,7 @@ const commands = {
             });
 
             if (result.success) {
-                let successMessage = `翻译文件导出成功！已导出 ${result.exportedCount} 个翻译文件`;
+                let successMessage = `翻译同步成功！已更新 ${result.exportedCount} 个语言文件`;
                 
                 if (result.warnings && result.warnings.length > 0) {
                     successMessage += '\n\n注意：\n' + result.warnings.join('\n');
@@ -364,12 +391,12 @@ const commands = {
                 
                 vscode.window.showInformationMessage(successMessage);
             } else {
-                const errorMessage = `翻译文件导出失败：\n${result.errors.join('\n')}`;
+                const errorMessage = `翻译同步失败：\n${result.errors.join('\n')}`;
                 vscode.window.showErrorMessage(errorMessage);
             }
 
         } catch (error) {
-            vscode.window.showErrorMessage(`导出翻译文件失败：${error}`);
+            vscode.window.showErrorMessage(`同步翻译失败：${error}`);
         }
     }),
 

@@ -72,8 +72,8 @@
       },
       {
         "command": "contexto.exportTranslations",
-        "title": "导出翻译",
-        "icon": "$(export)"
+        "title": "同步翻译",
+        "icon": "$(sync)"
       },
       {
         "command": "contexto.showI18nViewer",
@@ -83,6 +83,11 @@
       {
         "command": "contexto.refresh",
         "title": "刷新",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "contexto.refreshStats",
+        "title": "刷新统计数据",
         "icon": "$(refresh)"
       },
       {
@@ -114,19 +119,24 @@
           "group": "navigation@2"
         },
         {
-          "command": "contexto.showI18nViewer",
+          "command": "contexto.refresh",
           "when": "view == contexto",
           "group": "navigation@3"
         },
         {
-          "command": "contexto.refresh",
+          "command": "contexto.openConfig",
           "when": "view == contexto",
           "group": "navigation@4"
         },
         {
-          "command": "contexto.openConfig",
-          "when": "view == contexto",
-          "group": "navigation@5"
+          "command": "contexto.refreshStats",
+          "when": "view == contexto.stats",
+          "group": "navigation@1"
+        },
+        {
+          "command": "contexto.showI18nViewer",
+          "when": "view == contexto.stats",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [

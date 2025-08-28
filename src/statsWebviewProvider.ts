@@ -287,22 +287,6 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                     color: var(--vscode-charts-green);
                 }
                 
-                .refresh-button {
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    margin-top: 12px;
-                    width: 100%;
-                    font-size: 12px;
-                }
-                
-                .refresh-button:hover {
-                    background: var(--vscode-button-hoverBackground);
-                }
-                
                 .total-cache {
                     background-color: var(--vscode-inputOption-hoverBackground);
                     border-radius: 3px;
@@ -336,17 +320,7 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                     <div class="stat-group-title">各语言翻译进度</div>
                     ${languageStatsHtml}
                 </div>
-                
-                <button class="refresh-button" onclick="refreshStats()">刷新数据</button>
             </div>
-            
-            <script>
-                const vscode = acquireVsCodeApi();
-                
-                function refreshStats() {
-                    vscode.postMessage({ type: 'refresh' });
-                }
-            </script>
         </body>
         </html>`;
     }

@@ -14,7 +14,7 @@ export class ExportManager {
     }
 
     /**
-     * 导出翻译文件
+     * 同步翻译到语言文件
      */
     async exportTranslations(config: ContextoConfig, cache: I18nCache, options?: ExportOptions): Promise<ExportResult> {
         const result: ExportResult = {

@@ -515,7 +515,7 @@ export class ContextoCore {
     }
 
     /**
-     * 导出翻译文件
+     * 同步翻译到语言文件
      */
     async exportTranslations(options?: ExportOptions): Promise<ExportResult> {
         if (!this.config) {
