@@ -52,18 +52,74 @@
 源语言字典文件路径，相对于项目根目录。
 
 ### targetLangs
-目标语言列表，支持的语言代码：
-- `en` - English
-- `ja` - Japanese
-- `ko` - Korean
-- `fr` - French
-- `de` - German
-- `es` - Spanish
-- `pt` - Portuguese
-- `ru` - Russian
-- `ar` - Arabic
-- `th` - Thai
-- `vi` - Vietnamese
+目标语言列表，支持丰富的语言代码：
+
+**主要语言**
+- `en` - English (英语)
+- `en-US` - English (US) (美式英语)  
+- `en-GB` - English (UK) (英式英语)
+
+**中文变体**
+- `zh-CN` - Simplified Chinese (简体中文)
+- `zh-TW` - Traditional Chinese (繁体中文)
+- `zh-HK` - Traditional Chinese (Hong Kong) (繁体中文-香港)
+- `zh-SG` - Simplified Chinese (Singapore) (简体中文-新加坡)
+
+**亚洲语言**
+- `ja` - Japanese (日语)
+- `ko` - Korean (韩语)
+- `th` - Thai (泰语)
+- `vi` - Vietnamese (越南语)
+- `id` - Indonesian (印尼语)
+- `ms` - Malay (马来语)
+- `tl` - Filipino (菲律宾语)
+- `hi` - Hindi (印地语)
+- `bn` - Bengali (孟加拉语)
+- `ta` - Tamil (泰米尔语)
+
+**欧洲语言**
+- `fr` - French (法语)
+- `fr-CA` - French (Canada) (法语-加拿大)
+- `de` - German (德语)
+- `de-AT` - German (Austria) (德语-奥地利)
+- `es` - Spanish (西班牙语)
+- `es-MX` - Spanish (Mexico) (西班牙语-墨西哥)
+- `pt` - Portuguese (葡萄牙语)
+- `pt-BR` - Portuguese (Brazil) (葡萄牙语-巴西)
+- `it` - Italian (意大利语)
+- `nl` - Dutch (荷兰语)
+- `sv` - Swedish (瑞典语)
+- `no` - Norwegian (挪威语)
+- `da` - Danish (丹麦语)
+- `fi` - Finnish (芬兰语)
+- `pl` - Polish (波兰语)
+- `cs` - Czech (捷克语)
+- `ru` - Russian (俄语)
+- `uk` - Ukrainian (乌克兰语)
+
+**中东及其他**
+- `ar` - Arabic (阿拉伯语)
+- `ar-SA` - Arabic (Saudi Arabia) (阿拉伯语-沙特)
+- `fa` - Persian/Farsi (波斯语)
+- `tr` - Turkish (土耳其语)
+- `he` - Hebrew (希伯来语)
+- `sw` - Swahili (斯瓦希里语)
+
+**配置示例**：
+```json
+{
+    "targetLangs": [
+        "en",        // 英语
+        "zh-TW",     // 繁体中文
+        "ja",        // 日语
+        "ko",        // 韩语
+        "fr",        // 法语
+        "de",        // 德语
+        "es",        // 西班牙语
+        "ar"         // 阿拉伯语
+    ]
+}
+```
 
 ### ignore
 忽略扫描的目录和文件列表，支持glob模式。
