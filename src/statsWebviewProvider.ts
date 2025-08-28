@@ -188,64 +188,64 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                     color: var(--vscode-foreground);
                     background-color: var(--vscode-editor-background);
                     margin: 0;
-                    padding: 16px;
-                    line-height: 1.4;
+                    padding: 12px;
+                    line-height: 1.3;
                 }
                 
                 .stats-container {
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
+                    gap: 12px;
                 }
                 
                 .overview-cards {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
-                    gap: 12px;
-                    margin-bottom: 8px;
+                    gap: 8px;
+                    margin-bottom: 6px;
                 }
                 
                 .overview-card {
                     background: var(--vscode-inputOption-hoverBackground);
-                    border-radius: 8px;
-                    padding: 12px;
+                    border-radius: 6px;
+                    padding: 10px;
                     text-align: center;
                 }
                 
                 .overview-number {
-                    font-size: 20px;
+                    font-size: 18px;
                     font-weight: 700;
                     color: var(--vscode-charts-blue);
                     display: block;
-                    margin-bottom: 4px;
+                    margin-bottom: 3px;
                 }
                 
                 .overview-label {
-                    font-size: 11px;
+                    font-size: 10px;
                     color: var(--vscode-descriptionForeground);
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
+                    letter-spacing: 0.3px;
                 }
                 
                 .stat-group {
                     border: 1px solid var(--vscode-panel-border);
                     border-radius: 6px;
-                    padding: 16px;
+                    padding: 12px;
                     background-color: var(--vscode-editor-background);
                 }
                 
                 .stat-group-title {
                     font-weight: 600;
-                    margin-bottom: 12px;
+                    margin-bottom: 8px;
                     color: var(--vscode-foreground);
-                    font-size: 14px;
+                    font-size: 13px;
                 }
                 
                 .stat-item {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    padding: 8px 0;
+                    padding: 6px 0;
                     border-bottom: 1px solid var(--vscode-widget-border);
                 }
                 
@@ -255,18 +255,18 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                 
                 .stat-label {
                     color: var(--vscode-descriptionForeground);
-                    font-size: 13px;
+                    font-size: 12px;
                 }
                 
                 .stat-value {
                     font-weight: 600;
                     color: var(--vscode-foreground);
-                    font-size: 14px;
+                    font-size: 13px;
                 }
                 
                 .stat-value.highlight {
                     color: var(--vscode-charts-blue);
-                    font-size: 16px;
+                    font-size: 15px;
                 }
                 
                 .stat-value.warning {
@@ -281,12 +281,12 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                     background: var(--vscode-button-background);
                     color: var(--vscode-button-foreground);
                     border: none;
-                    padding: 8px 16px;
+                    padding: 6px 12px;
                     border-radius: 4px;
                     cursor: pointer;
-                    margin-top: 16px;
+                    margin-top: 12px;
                     width: 100%;
-                    font-size: 13px;
+                    font-size: 12px;
                 }
                 
                 .refresh-button:hover {
@@ -295,8 +295,8 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                 
                 .total-cache {
                     background-color: var(--vscode-inputOption-hoverBackground);
-                    border-radius: 4px;
-                    padding: 4px 8px;
+                    border-radius: 3px;
+                    padding: 3px 6px;
                 }
             </style>
         </head>
