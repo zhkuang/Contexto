@@ -4,10 +4,12 @@ import * as path from 'path';
 import { ConfigManager } from './configManager';
 import { KeyAnalyzer } from './keyAnalyzer';
 import { OpenAIService } from './aiService';
-import { ContextoConfig, I18nCache, KeyAnalysis, TranslationTask, TranslationItem, ConfigValidation, ProjectStatus } from './types';
+import { ExportManager } from './exportManager';
+import { ContextoConfig, I18nCache, KeyAnalysis, TranslationTask, TranslationItem, ConfigValidation, ProjectStatus, ExportResult, TargetLangConfig, ExportOptions } from './types';
 
 export class ContextoCore {
     private configManager: ConfigManager;
+    private exportManager: ExportManager;
     private keyAnalyzer: KeyAnalyzer | null = null;
     private aiService: OpenAIService | null = null;
     private config: ContextoConfig | null = null;
@@ -18,6 +20,7 @@ export class ContextoCore {
 
     constructor(workspaceRoot: string) {
         this.configManager = new ConfigManager(workspaceRoot);
+        this.exportManager = new ExportManager(workspaceRoot);
     }
 
     /**
@@ -337,7 +340,10 @@ export class ContextoCore {
             // 检查是否为更新的key
             const isUpdatedKey = this.analysis?.updatedKeys.includes(key);
             
-            for (const targetLang of this.config.targetLangs) {
+            const targetLangs = this.config.targetLangs as Array<string | TargetLangConfig>;
+            for (const targetLangItem of targetLangs) {
+                const targetLang: string = typeof targetLangItem === 'string' ? targetLangItem : targetLangItem.lang;
+                
                 // 对于更新的key，强制重新翻译所有目标语言
                 // 对于新增和待翻译的key，只翻译缺失的语言
                 const needsTranslation = isUpdatedKey || 
@@ -474,5 +480,51 @@ export class ContextoCore {
      */
     getWorkspaceRoot(): string {
         return this.configManager.getWorkspaceRoot();
+    }
+
+    /**
+     * 检查是否有可导出的翻译数据
+     */
+    hasExportableData(): boolean {
+        return this.exportManager.hasExportableData(this.cache);
+    }
+
+    /**
+     * 获取导出预览
+     */
+    getExportPreview(): string[] {
+        if (!this.config) {
+            return [];
+        }
+        return this.exportManager.getExportPreview(this.config);
+    }
+
+    /**
+     * 导出翻译文件
+     */
+    async exportTranslations(options?: ExportOptions): Promise<ExportResult> {
+        if (!this.config) {
+            return {
+                success: false,
+                exportedFiles: [],
+                errors: ['配置尚未加载']
+            };
+        }
+
+        if (!this.hasExportableData()) {
+            return {
+                success: false,
+                exportedFiles: [],
+                errors: ['没有可导出的翻译数据，请先执行翻译操作']
+            };
+        }
+
+        // 使用默认的 'skip' 策略，只导出已翻译的键
+        const exportOptions: ExportOptions = {
+            fallbackStrategy: 'skip',
+            ...options
+        };
+
+        return await this.exportManager.exportTranslations(this.config, this.cache, exportOptions);
     }
 }

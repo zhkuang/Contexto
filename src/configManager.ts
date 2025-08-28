@@ -48,6 +48,8 @@ export class ConfigManager {
                 "ar",           // 阿拉伯语
                 "th",           // 泰语
                 "vi"            // 越南语
+                // 也可以使用对象格式：
+                // { lang: "en", outputPath: "./locales/en.json" }
             ],
             ignore: ["./contexto", "./node_modules", "./.git"],
             aiService: {

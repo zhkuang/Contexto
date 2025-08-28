@@ -94,7 +94,10 @@ export class KeyAnalyzer {
                 }
                 
                 const missingTargetLangs = this.config.targetLangs.filter(
-                    targetLang => !translations[targetLang] || translations[targetLang].trim() === ''
+                    targetLangItem => {
+                        const targetLang = typeof targetLangItem === 'string' ? targetLangItem : targetLangItem.lang;
+                        return !translations[targetLang] || translations[targetLang].trim() === '';
+                    }
                 );
                 
                 if (missingTargetLangs.length > 0) {

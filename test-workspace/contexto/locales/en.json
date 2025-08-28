@@ -1,0 +1,10 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "login": {
+        "username": "Username",
+        "password": "Password"
+    }
+}

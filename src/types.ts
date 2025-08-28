@@ -1,9 +1,15 @@
 // 数据类型定义
 
+// 目标语种配置
+export interface TargetLangConfig {
+    lang: string;          // 语种代码，如 'en', 'zh-TW'
+    outputPath?: string;   // 可选的输出文件路径，不配置则使用默认路径
+}
+
 // 插件配置
 export interface ContextoConfig {
     sourceLangDict: string;
-    targetLangs: string[];
+    targetLangs: (string | TargetLangConfig)[];  // 支持字符串或对象格式
     ignore: string[];
     contextLines?: number; // 上下文提取行数，默认5行
     aiService: {
@@ -85,4 +91,18 @@ export interface AIService {
         businessContext: string;
         uiContext?: string;
     }>;
+}
+
+// 导出任务结果
+export interface ExportResult {
+    success: boolean;
+    exportedFiles: string[];
+    errors: string[];
+    warnings?: string[];
+}
+
+// 导出选项
+export interface ExportOptions {
+    fallbackStrategy?: 'skip' | 'source' | 'placeholder' | 'key';
+    includeMissingTranslations?: boolean;
 }

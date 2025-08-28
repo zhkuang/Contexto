@@ -1,0 +1,18 @@
+{
+    "common": {
+        "ok": "common.ok",
+        "cancel": "取消",
+        "save": "common.save",
+        "delete": "common.delete",
+        "edit": "common.edit",
+        "add": "common.add",
+        "search": "common.search"
+    },
+    "user": {
+        "login": "登入",
+        "logout": "user.logout",
+        "username": "使用者名稱",
+        "password": "user.password",
+        "email": "user.email"
+    }
+}

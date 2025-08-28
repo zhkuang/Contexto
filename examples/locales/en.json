@@ -1,0 +1,39 @@
+{
+    "common": {
+        "ok": "common.ok",
+        "cancel": "Cancel",
+        "save": "common.save",
+        "delete": "common.delete",
+        "edit": "common.edit",
+        "add": "common.add",
+        "search": "common.search",
+        "loading": "Loading...",
+        "error": "common.error",
+        "success": "common.success"
+    },
+    "user": {
+        "login": "Login",
+        "logout": "user.logout",
+        "register": "user.register",
+        "profile": "user.profile",
+        "settings": "user.settings",
+        "username": "Username",
+        "password": "Password",
+        "email": "user.email"
+    },
+    "validation": {
+        "test": "Test Item",
+        "required": "This field is required",
+        "email_invalid": "validation.email_invalid",
+        "password_too_short": "Password must be at least 8 characters",
+        "passwords_not_match": "validation.passwords_not_match"
+    },
+    "messages": {
+        "app": "messages.app",
+        "welcome": "Welcome to use our plugin",
+        "goodbye": "Thank you for using our service, goodbye!",
+        "data_saved": "messages.data_saved",
+        "confirm_delete": "messages.confirm_delete",
+        "operation_failed": "messages.operation_failed"
+    }
+}

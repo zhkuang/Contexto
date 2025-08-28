@@ -71,6 +71,11 @@
         "icon": "$(globe)"
       },
       {
+        "command": "contexto.exportTranslations",
+        "title": "导出翻译",
+        "icon": "$(export)"
+      },
+      {
         "command": "contexto.refresh",
         "title": "刷新",
         "icon": "$(refresh)"
@@ -99,14 +104,19 @@
           "group": "navigation@1"
         },
         {
-          "command": "contexto.refresh",
+          "command": "contexto.exportTranslations",
           "when": "view == contexto",
           "group": "navigation@2"
         },
         {
-          "command": "contexto.openConfig",
+          "command": "contexto.refresh",
           "when": "view == contexto",
           "group": "navigation@3"
+        },
+        {
+          "command": "contexto.openConfig",
+          "when": "view == contexto",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [

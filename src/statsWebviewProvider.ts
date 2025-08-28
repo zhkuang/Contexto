@@ -89,13 +89,16 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
         const unusedKeysCount = analysis?.obsoleteKeys?.length || 0;
 
         // 缓存中的key数量（按语言分组）
-        const cacheStats = this._calculateCacheStats(cache, config.targetLangs);
+        const targetLangStrings = config.targetLangs.map(lang => 
+            typeof lang === 'string' ? lang : lang.lang
+        );
+        const cacheStats = this._calculateCacheStats(cache, targetLangStrings);
 
         return {
             originalKeysCount,
             unusedKeysCount,
             cacheStats,
-            targetLanguages: config.targetLangs
+            targetLanguages: targetLangStrings
         };
     }
 

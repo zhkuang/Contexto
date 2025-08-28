@@ -1,8 +1,14 @@
 {
     "sourceLangDict": "zh-CN.json",
     "targetLangs": [
-        "en",
-        "zh-TW"
+        {
+            "lang": "en",
+            "outputPath": "./locales/en.json"
+        },
+        {
+            "lang": "zh-TW",
+            "outputPath": "./locales/zh-TW.json"
+        }
     ],
     "ignore": [
         "./contexto",

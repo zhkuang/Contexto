@@ -1,0 +1,10 @@
+{
+  "sourceLangDict": "zh-CN.json",
+  "targetLangs": [
+    "en",
+    {
+      "lang": "zh-TW",
+      "outputPath": "./test-output/traditional.json"
+    }
+  ]
+}

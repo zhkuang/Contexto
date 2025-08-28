@@ -280,6 +280,95 @@ const commands = {
         } catch (error) {
             vscode.window.showErrorMessage(`切换日志失败: ${error}`);
         }
+    }),
+
+    exportTranslations: vscode.commands.registerCommand('contexto.exportTranslations', async () => {
+        if (!core) {
+            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            return;
+        }
+
+        try {
+            // 1. 检查是否有可导出的数据
+            if (!core.hasExportableData()) {
+                vscode.window.showWarningMessage('没有可导出的翻译数据，请先执行翻译操作');
+                return;
+            }
+
+            // 2. 获取导出预览
+            const exportFiles = core.getExportPreview();
+            if (exportFiles.length === 0) {
+                vscode.window.showWarningMessage('目标语种配置为空，请检查 config.json 中的 targetLangs 配置');
+                return;
+            }
+
+            // 3. 让用户选择导出策略
+            const strategyChoice = await vscode.window.showQuickPick([
+                {
+                    label: '仅导出已翻译内容 (推荐)',
+                    description: '只导出已有翻译的键，避免混合语言',
+                    detail: 'skip',
+                },
+                {
+                    label: '包含占位符',
+                    description: '未翻译的键使用占位符标记，便于识别',
+                    detail: 'placeholder',
+                },
+                {
+                    label: '使用源文本填充',
+                    description: '未翻译的键使用源语言文本',
+                    detail: 'source',
+                },
+                {
+                    label: '使用键名填充',
+                    description: '未翻译的键显示为键名',
+                    detail: 'key',
+                }
+            ], {
+                placeHolder: '选择导出策略',
+                title: '导出翻译文件'
+            });
+
+            if (!strategyChoice) {
+                return; // 用户取消
+            }
+
+            // 4. 显示导出预览，询问用户确认
+            const fileList = exportFiles.map(file => `• ${file}`).join('\n');
+            const confirmMessage = `即将导出翻译文件到以下位置：\n\n${fileList}\n\n策略: ${strategyChoice.label}\n\n注意：这将覆盖已存在的文件。`;
+            
+            const choice = await vscode.window.showInformationMessage(
+                confirmMessage,
+                { modal: true },
+                '确认导出'
+            );
+
+            if (choice !== '确认导出') {
+                return;
+            }
+
+            // 5. 执行导出
+            vscode.window.showInformationMessage('正在导出翻译文件...');
+            const result = await core.exportTranslations({ 
+                fallbackStrategy: strategyChoice.detail as any 
+            });
+
+            if (result.success) {
+                let successMessage = `翻译文件导出成功！\n已导出 ${result.exportedFiles.length} 个文件：\n${result.exportedFiles.map(f => `• ${f}`).join('\n')}`;
+                
+                if (result.warnings && result.warnings.length > 0) {
+                    successMessage += '\n\n注意：\n' + result.warnings.join('\n');
+                }
+                
+                vscode.window.showInformationMessage(successMessage);
+            } else {
+                const errorMessage = `翻译文件导出失败：\n${result.errors.join('\n')}`;
+                vscode.window.showErrorMessage(errorMessage);
+            }
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`导出翻译文件失败：${error}`);
+        }
     })
 };
 
