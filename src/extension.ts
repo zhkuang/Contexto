@@ -310,19 +310,9 @@ const commands = {
                     detail: 'skip',
                 },
                 {
-                    label: '包含占位符',
-                    description: '未翻译的键使用占位符标记，便于识别',
-                    detail: 'placeholder',
-                },
-                {
                     label: '使用源文本填充',
                     description: '未翻译的键使用源语言文本',
                     detail: 'source',
-                },
-                {
-                    label: '使用键名填充',
-                    description: '未翻译的键显示为键名',
-                    detail: 'key',
                 }
             ], {
                 placeHolder: '选择导出策略',

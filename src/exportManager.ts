@@ -192,12 +192,6 @@ export class ExportManager {
             case 'source':
                 // 使用源文件文本
                 return sourceValue || key;
-            case 'placeholder':
-                // 使用占位符
-                return `[需要${targetLang}翻译: ${sourceValue || key}]`;
-            case 'key':
-                // 使用键名
-                return key;
             default:
                 return null;
         }

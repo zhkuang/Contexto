@@ -103,6 +103,6 @@ export interface ExportResult {
 
 // 导出选项
 export interface ExportOptions {
-    fallbackStrategy?: 'skip' | 'source' | 'placeholder' | 'key';
+    fallbackStrategy?: 'skip' | 'source';
     includeMissingTranslations?: boolean;
 }
