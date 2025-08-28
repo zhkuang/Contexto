@@ -19,7 +19,7 @@ export class ExportManager {
     async exportTranslations(config: ContextoConfig, cache: I18nCache, options?: ExportOptions): Promise<ExportResult> {
         const result: ExportResult = {
             success: true,
-            exportedFiles: [],
+            exportedCount: 0,
             errors: [],
             warnings: []
         };
@@ -55,11 +55,11 @@ export class ExportManager {
                     const exportPath = this.getExportPath(config.sourceLangDict, langConfig);
                     
                     const langResult = await this.exportSingleLanguage(langConfig.lang, sourceKeys, sourceData, cache, exportPath, exportOptions);
-                    result.exportedFiles.push(exportPath);
+                    result.exportedCount++;
                     
-                    // 收集警告信息
-                    if (langResult.missingCount > 0) {
-                        result.warnings?.push(`语种 ${langConfig.lang}: ${langResult.missingCount} 个键缺少翻译`);
+                    // 根据导出策略收集警告信息
+                    if (langResult.missingCount > 0 && exportOptions.fallbackStrategy === 'source') {
+                        result.warnings?.push(`语种 ${langConfig.lang}: ${langResult.missingCount} 个键保持原文导出`);
                     }
                     
                 } catch (error) {
@@ -70,7 +70,7 @@ export class ExportManager {
             }
             
             if (result.success) {
-                console.log(`导出完成！已导出 ${result.exportedFiles.length} 个文件`);
+                console.log(`导出完成！已成功导出 ${result.exportedCount} 个翻译文件`);
             }
 
         } catch (error) {
@@ -168,10 +168,6 @@ export class ExportManager {
                 }
                 missingTranslations++;
             }
-        }
-
-        if (missingTranslations > 0) {
-            console.log(`导出语种 ${lang}: ${missingTranslations} 个键缺少翻译`);
         }
 
         // 根据文件格式导出

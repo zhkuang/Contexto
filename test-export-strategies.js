@@ -92,12 +92,12 @@ async function testExportSkipStrategy() {
             const result = await exportManager.exportTranslations(testConfig, testCache, options);
             console.log('导出结果:', result);
 
-            if (result.success && result.exportedFiles.length > 0) {
-                // 只检查第一个文件（英文）
-                const firstFile = result.exportedFiles[0];
-                if (fs.existsSync(firstFile)) {
-                    const content = fs.readFileSync(firstFile, 'utf-8');
-                    console.log(`\n=== ${strategy} 策略 - ${firstFile} ===`);
+            if (result.success && result.exportedCount > 0) {
+                // 检查默认输出目录中的英文文件
+                const exportPath = path.join(testWorkspace, 'contexto', 'locales', 'en.json');
+                if (fs.existsSync(exportPath)) {
+                    const content = fs.readFileSync(exportPath, 'utf-8');
+                    console.log(`\n=== ${strategy} 策略 - ${exportPath} ===`);
                     console.log(content);
                     
                     // 解析并验证内容

@@ -506,7 +506,7 @@ export class ContextoCore {
         if (!this.config) {
             return {
                 success: false,
-                exportedFiles: [],
+                exportedCount: 0,
                 errors: ['配置尚未加载']
             };
         }
@@ -514,7 +514,7 @@ export class ContextoCore {
         if (!this.hasExportableData()) {
             return {
                 success: false,
-                exportedFiles: [],
+                exportedCount: 0,
                 errors: ['没有可导出的翻译数据，请先执行翻译操作']
             };
         }

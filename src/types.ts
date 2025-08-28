@@ -96,7 +96,7 @@ export interface AIService {
 // 导出任务结果
 export interface ExportResult {
     success: boolean;
-    exportedFiles: string[];
+    exportedCount: number;    // 导出的文件数量
     errors: string[];
     warnings?: string[];
 }

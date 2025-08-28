@@ -338,13 +338,21 @@ const commands = {
             }
 
             // 5. 执行导出
-            vscode.window.showInformationMessage('正在导出翻译文件...');
-            const result = await core.exportTranslations({ 
-                fallbackStrategy: strategyChoice.detail as any 
+            const result = await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: "正在导出翻译文件...",
+                cancellable: false
+            }, async (progress) => {
+                if (!core) {
+                    throw new Error('Contexto 项目尚未初始化');
+                }
+                return await core.exportTranslations({ 
+                    fallbackStrategy: strategyChoice.detail as any 
+                });
             });
 
             if (result.success) {
-                let successMessage = `翻译文件导出成功！\n已导出 ${result.exportedFiles.length} 个文件：\n${result.exportedFiles.map(f => `• ${f}`).join('\n')}`;
+                let successMessage = `翻译文件导出成功！已导出 ${result.exportedCount} 个翻译文件`;
                 
                 if (result.warnings && result.warnings.length > 0) {
                     successMessage += '\n\n注意：\n' + result.warnings.join('\n');

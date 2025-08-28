@@ -84,11 +84,14 @@ async function testExportFixed() {
         console.log('导出结果:', result);
 
         if (result.success) {
-            console.log('导出成功！检查文件内容:');
-            for (const file of result.exportedFiles) {
-                if (fs.existsSync(file)) {
-                    const content = fs.readFileSync(file, 'utf-8');
-                    console.log(`\n=== ${file} ===`);
+            console.log('导出成功！检查默认输出目录:');
+            const localesDir = path.join(testWorkspace, 'contexto', 'locales');
+            if (fs.existsSync(localesDir)) {
+                const files = fs.readdirSync(localesDir).filter(f => f.endsWith('.json'));
+                for (const fileName of files) {
+                    const filePath = path.join(localesDir, fileName);
+                    const content = fs.readFileSync(filePath, 'utf-8');
+                    console.log(`\n=== ${filePath} ===`);
                     console.log(content);
                     
                     // 解析并验证内容
@@ -102,9 +105,9 @@ async function testExportFixed() {
                     } catch (e) {
                         console.log('JSON解析失败:', e.message);
                     }
-                } else {
-                    console.log(`文件不存在: ${file}`);
                 }
+            } else {
+                console.log(`输出目录不存在: ${localesDir}`);
             }
         } else {
             console.log('导出失败:', result.errors);
