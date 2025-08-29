@@ -1,17 +1,22 @@
 {
-    "sourceLangDict": "",
-    "targetLangs": [],
+    "sourceLangDict": "./zh-CN.json",
+    "contextLines": 5,
+    "targetLangs": [
+        {
+            "lang": "en",
+            "outputPath": "./locales/en.json"
+        }
+    ],
     "ignore": [
         "./contexto",
         "./node_modules",
         "./.git",
         "./.vscode"
     ],
-    "contextLines": 5,
     "aiService": {
         "type": "openai",
-        "apiKey": "",
-        "base": "https://api.openai.com/v1",
-        "model": "gpt-4"
+        "apiKey": "sk-vl80TDuDmHwPHArAZobIbRtN3TXniuZ22fHdnt60dBct1TKk",
+        "base": "https://api.chatanywhere.tech/v1",
+        "model": "gpt-4.1-mini"
     }
 }

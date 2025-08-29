@@ -203,7 +203,6 @@ const commands = {
                 statsProvider.refresh();
                 
                 console.log('刷新完成');
-                vscode.window.showInformationMessage('Contexto: 刷新完成');
             } catch (error) {
                 console.error('刷新失败:', error);
                 vscode.window.showErrorMessage(`刷新失败：${error}`);
