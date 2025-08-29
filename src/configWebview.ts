@@ -706,8 +706,8 @@ export class ConfigWebviewProvider {
             <div class="section-title">基础配置</div>
             
             <div class="form-group">
-                <label class="form-label">源语言字典文件 <span class="required">*</span></label>
-                <div class="form-description">指定包含原始文本的语言字典文件，支持 JSON 格式</div>
+                <label class="form-label">源语言字典文件</label>
+                <div class="form-description">请选择您项目原始语种字典文件，后面的分析、翻译都以该字典文件为基准。</div>
                 <div class="input-group">
                     <input type="text" id="sourceLangDict" class="form-input" placeholder="./locales/zh-CN.json" readonly />
                     <button class="btn btn-secondary" onclick="selectSourceDict()">浏览</button>
@@ -730,7 +730,7 @@ export class ConfigWebviewProvider {
 
         <div class="section">
             <div class="section-title">忽略路径配置</div>
-            <div class="form-description">指定在扫描源代码时需要忽略的文件或目录路径</div>
+            <div class="form-description">指定在扫描文本项上下文时需要忽略的文件或目录路径</div>
             
             <div class="list-container" id="ignoreContainer">
                 <!-- 忽略路径项将通过 JavaScript 动态生成 -->

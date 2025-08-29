@@ -208,12 +208,12 @@ export class ConfigErrorWebviewProvider implements vscode.WebviewViewProvider {
                     <div class="actions">
                         <button class="action-button" onclick="openConfig()">
                             <span>⚙️</span>
-                            <span>打开配置文件</span>
+                            <span>配置</span>
                         </button>
                         
                         <button class="action-button secondary" onclick="refresh()">
                             <span>🔄</span>
-                            <span>重新检测配置</span>
+                            <span>检测配置</span>
                         </button>
                     </div>
 

@@ -74,7 +74,6 @@
 {
     "sourceLangDict": "./locales/zh-CN.json",     // 源语言文件路径
     "targetLangs": [                              // 目标语言配置
-        "en",                                     // 简单语言代码
         {                                         // 自定义输出路径
             "lang": "zh-TW", 
             "outputPath": "./i18n/zh-TW.json"
