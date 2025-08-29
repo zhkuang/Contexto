@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { AIService, TranslationTask, ContextoConfig } from './types';
 import { Logger } from './logger';
+import { langMap } from './config';
 
 export class OpenAIService implements AIService {
     private config: ContextoConfig['aiService'];
@@ -88,134 +89,6 @@ export class OpenAIService implements AIService {
      * 构建翻译提示词
      */
     private buildTranslationPrompt(tasks: TranslationTask[], targetLang: string): string {
-        const langMap: Record<string, string> = {
-            // 主要语言
-            'en': 'English',
-            'en-US': 'English (US)',
-            'en-GB': 'English (UK)',
-            
-            // 中文变体
-            'zh-CN': 'Simplified Chinese',
-            'zh-TW': 'Traditional Chinese',
-            'zh-HK': 'Traditional Chinese (Hong Kong)',
-            'zh-SG': 'Simplified Chinese (Singapore)',
-            
-            // 亚洲语言
-            'ja': 'Japanese',
-            'ko': 'Korean',
-            'th': 'Thai',
-            'vi': 'Vietnamese',
-            'id': 'Indonesian',
-            'ms': 'Malay',
-            'tl': 'Filipino',
-            'my': 'Burmese',
-            'km': 'Khmer',
-            'lo': 'Lao',
-            'si': 'Sinhala',
-            'ta': 'Tamil',
-            'te': 'Telugu',
-            'hi': 'Hindi',
-            'bn': 'Bengali',
-            'ur': 'Urdu',
-            
-            // 欧洲语言
-            'fr': 'French',
-            'fr-CA': 'French (Canada)',
-            'de': 'German',
-            'de-AT': 'German (Austria)',
-            'de-CH': 'German (Switzerland)',
-            'es': 'Spanish',
-            'es-MX': 'Spanish (Mexico)',
-            'es-AR': 'Spanish (Argentina)',
-            'pt': 'Portuguese',
-            'pt-BR': 'Portuguese (Brazil)',
-            'it': 'Italian',
-            'nl': 'Dutch',
-            'sv': 'Swedish',
-            'no': 'Norwegian',
-            'da': 'Danish',
-            'fi': 'Finnish',
-            'is': 'Icelandic',
-            'pl': 'Polish',
-            'cs': 'Czech',
-            'sk': 'Slovak',
-            'hu': 'Hungarian',
-            'ro': 'Romanian',
-            'bg': 'Bulgarian',
-            'hr': 'Croatian',
-            'sr': 'Serbian',
-            'sl': 'Slovenian',
-            'lv': 'Latvian',
-            'lt': 'Lithuanian',
-            'et': 'Estonian',
-            'mt': 'Maltese',
-            'ga': 'Irish',
-            'cy': 'Welsh',
-            'eu': 'Basque',
-            'ca': 'Catalan',
-            'gl': 'Galician',
-            
-            // 俄语及周边
-            'ru': 'Russian',
-            'uk': 'Ukrainian',
-            'be': 'Belarusian',
-            'kk': 'Kazakh',
-            'ky': 'Kyrgyz',
-            'uz': 'Uzbek',
-            'tg': 'Tajik',
-            'mn': 'Mongolian',
-            
-            // 中东及北非
-            'ar': 'Arabic',
-            'ar-SA': 'Arabic (Saudi Arabia)',
-            'ar-EG': 'Arabic (Egypt)',
-            'ar-AE': 'Arabic (UAE)',
-            'fa': 'Persian',
-            'tr': 'Turkish',
-            'he': 'Hebrew',
-            'ku': 'Kurdish',
-            'am': 'Amharic',
-            
-            // 非洲语言
-            'sw': 'Swahili',
-            'zu': 'Zulu',
-            'xh': 'Xhosa',
-            'af': 'Afrikaans',
-            'yo': 'Yoruba',
-            'ig': 'Igbo',
-            'ha': 'Hausa',
-            
-            // 美洲原住民语言
-            'qu': 'Quechua',
-            'gn': 'Guarani',
-            
-            // 其他重要语言
-            'el': 'Greek',
-            'mk': 'Macedonian',
-            'sq': 'Albanian',
-            'hy': 'Armenian',
-            'ka': 'Georgian',
-            'az': 'Azerbaijani',
-            'ne': 'Nepali',
-            'mr': 'Marathi',
-            'gu': 'Gujarati',
-            'pa': 'Punjabi',
-            'ml': 'Malayalam',
-            'kn': 'Kannada',
-            'or': 'Odia',
-            'as': 'Assamese',
-            'sd': 'Sindhi',
-            'sa': 'Sanskrit',
-            'bo': 'Tibetan',
-            'dz': 'Dzongkha',
-            
-            // 太平洋地区
-            'mi': 'Maori',
-            'sm': 'Samoan',
-            'to': 'Tongan',
-            'fj': 'Fijian',
-        };
-
         const targetLangName = langMap[targetLang] || targetLang;
 
         let prompt = `请将以下中文文本翻译成 ${targetLangName}，严格遵循软件国际化标准。

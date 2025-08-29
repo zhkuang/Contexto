@@ -59,7 +59,14 @@
 ```json
 {
     "sourceLangDict": "./locales/zh-CN.json",
-    "targetLangs": ["en", "zh-TW", "ja", "ko"],
+    "targetLangs": [
+        {
+            "lang": "en",
+            "outputPath": "./locales/en.json"
+        }
+    ],
+    "ignore": ["./node_modules", "./dist"],
+    "contextLines": 5,
     "aiService": {
         "type": "openai",
         "apiKey": "your-api-key",

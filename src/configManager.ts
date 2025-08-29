@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ContextoConfig, I18nCache } from './types';
+import { defaultConfig } from './config';
 
 export class ConfigManager {
     private workspaceRoot: string;
@@ -32,23 +33,7 @@ export class ConfigManager {
             fs.mkdirSync(this.contextoDir, { recursive: true });
         }
 
-        // 创建默认配置
-        const defaultConfig: ContextoConfig = {
-            sourceLangDict: "",
-            targetLangs: [
-                "en",           // 英语
-                // 也可以使用对象格式：
-                // { lang: "en", outputPath: "./locales/en.json" }
-            ],
-            ignore: ["./contexto", "./node_modules", "./.git", "./.vscode"],
-            aiService: {
-                type: "openai",
-                apiKey: "",
-                base: "https://api.openai.com/v1",
-                model: "gpt-4"
-            }
-        };
-
+        // 使用默认配置
         await this.saveConfig(defaultConfig);
 
         // 创建空的翻译缓存
