@@ -19,7 +19,7 @@ export class ConfigWebviewProvider {
 
     public show() {
         if (!this.core) {
-            vscode.window.showErrorMessage('项目未初始化，无法打开配置页面');
+            vscode.window.showErrorMessage('请先初始化项目，然后再打开配置页面');
             return;
         }
 
@@ -88,7 +88,7 @@ export class ConfigWebviewProvider {
                 });
             }
         } catch (error) {
-            vscode.window.showErrorMessage(`加载配置失败：${error}`);
+            vscode.window.showErrorMessage(`配置加载失败：${error}`);
         }
     }
 
@@ -124,7 +124,7 @@ export class ConfigWebviewProvider {
             vscode.commands.executeCommand('contexto.refresh');
 
         } catch (error) {
-            vscode.window.showErrorMessage(`保存配置失败：${error}`);
+            vscode.window.showErrorMessage(`配置保存失败：${error}`);
             webview.postMessage({
                 type: 'saveError',
                 error: String(error)

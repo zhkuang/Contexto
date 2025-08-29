@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>i18n数据查看器</title>
+    <title>Contexto数据查看器</title>
     <style>
         body {
             font-family: var(--vscode-font-family);
@@ -157,16 +157,16 @@
 </head>
 <body>
     <div class="header">
-        <div class="title">i18n 数据查看器</div>
+        <div class="title">数据查看器</div>
         <div class="toolbar">
             <button class="btn btn-secondary" onclick="refreshData()">
-                🔄 刷新
+                刷新
             </button>
             <button class="btn btn-secondary" onclick="exportToExcel()">
-                📊 导出Excel
+                导出Excel
             </button>
             <button class="btn" onclick="triggerImport()">
-                📂 导入Excel
+                导入Excel
             </button>
             <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls" onchange="handleFileImport(event)">
         </div>
@@ -182,8 +182,8 @@
                 <tr>
                     <th>Key</th>
                     <th>原文</th>
-                    <th>业务上下文</th>
-                    <th>UI上下文</th>
+                    <th>业务场景</th>
+                    <th>UI场景</th>
                     {{LANGUAGE_HEADERS}}
                 </tr>
             </thead>

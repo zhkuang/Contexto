@@ -86,13 +86,13 @@ export class I18nViewerWebview {
             if (this.panel) {
                 this.panel.webview.postMessage({ type: 'hideLoading' });
             }
-            vscode.window.showInformationMessage('i18n数据已刷新');
+            vscode.window.showInformationMessage('数据已刷新');
         } catch (error) {
             // 隐藏加载状态并显示错误
             if (this.panel) {
                 this.panel.webview.postMessage({ type: 'hideLoading' });
             }
-            vscode.window.showErrorMessage(`刷新数据失败: ${error}`);
+            vscode.window.showErrorMessage(`数据刷新失败: ${error}`);
         }
     }
 
@@ -174,7 +174,7 @@ export class I18nViewerWebview {
 
     private async _exportToExcel() {
         if (!this.core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
@@ -191,9 +191,9 @@ export class I18nViewerWebview {
             }
 
             await this._generateExcelFile(saveUri.fsPath);
-            vscode.window.showInformationMessage(`Excel文件已导出: ${saveUri.fsPath}`);
+            vscode.window.showInformationMessage(`文件已导出: ${saveUri.fsPath}`);
         } catch (error) {
-            vscode.window.showErrorMessage(`导出Excel失败: ${error}`);
+            vscode.window.showErrorMessage(`导出失败: ${error}`);
         }
     }
 
@@ -208,7 +208,7 @@ export class I18nViewerWebview {
         const workbook = XLSX.utils.book_new();
         
         // 准备数据
-        const headers = ['Key', '原文', '业务上下文', 'UI上下文', ...targetLanguages];
+        const headers = ['Key', '原文', '业务场景', 'UI场景', ...targetLanguages];
         const data = [headers];
 
         Object.entries(cache).forEach(([key, item]) => {
@@ -229,8 +229,8 @@ export class I18nViewerWebview {
         const columnWidths = [
             { wch: 30 }, // Key
             { wch: 25 }, // 原文
-            { wch: 20 }, // 业务上下文
-            { wch: 20 }, // UI上下文
+            { wch: 20 }, // 业务场景
+            { wch: 20 }, // UI场景
             ...targetLanguages.map(() => ({ wch: 25 })) // 各语言列
         ];
         worksheet['!cols'] = columnWidths;
@@ -259,8 +259,8 @@ export class I18nViewerWebview {
             const headers = jsonData[0];
             const keyIndex = headers.indexOf('Key');
             const sourceIndex = headers.indexOf('原文');
-            const businessContextIndex = headers.indexOf('业务上下文');
-            const uiContextIndex = headers.indexOf('UI上下文');
+            const businessContextIndex = headers.indexOf('业务场景');
+            const uiContextIndex = headers.indexOf('UI场景');
 
             if (keyIndex === -1 || sourceIndex === -1) {
                 throw new Error('Excel文件格式错误，缺少必需的列：Key 和 原文');
@@ -327,11 +327,11 @@ export class I18nViewerWebview {
             // 保存缓存
             await this.core!.saveCache();
             
-            vscode.window.showInformationMessage(`Excel数据导入成功，共处理 ${importCount} 个翻译键`);
+            vscode.window.showInformationMessage(`数据导入成功，共处理 ${importCount} 个翻译文本`);
             this._updateWebview();
             
         } catch (error) {
-            throw new Error(`导入Excel失败: ${error}`);
+            throw new Error(`导入失败: ${error}`);
         }
     }
 
@@ -351,7 +351,7 @@ export class I18nViewerWebview {
             const fileContent = fs.readFileSync(openUri[0].fsPath);
             await this._importFromExcel(fileContent.buffer, openUri[0].fsPath);
         } catch (error) {
-            vscode.window.showErrorMessage(`导入Excel失败: ${error}`);
+            vscode.window.showErrorMessage(`导入失败: ${error}`);
         }
     }
 
@@ -367,8 +367,8 @@ export class I18nViewerWebview {
         const headers = lines[0].split('\t');
         const keyIndex = headers.indexOf('Key');
         const sourceIndex = headers.indexOf('原文');
-        const businessContextIndex = headers.indexOf('业务上下文');
-        const uiContextIndex = headers.indexOf('UI上下文');
+        const businessContextIndex = headers.indexOf('业务场景');
+        const uiContextIndex = headers.indexOf('UI场景');
 
         if (keyIndex === -1 || sourceIndex === -1) {
             throw new Error('文件格式错误，缺少必需的列：Key 和 原文');

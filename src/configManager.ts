@@ -55,7 +55,7 @@ export class ConfigManager {
             const content = fs.readFileSync(this.configPath, 'utf-8');
             return JSON.parse(content) as ContextoConfig;
         } catch (error) {
-            vscode.window.showErrorMessage(`配置文件加载失败：${error}`);
+            vscode.window.showErrorMessage(`配置加载失败：${error}`);
             return null;
         }
     }
@@ -68,7 +68,7 @@ export class ConfigManager {
             const content = JSON.stringify(config, null, 4);
             fs.writeFileSync(this.configPath, content, 'utf-8');
         } catch (error) {
-            vscode.window.showErrorMessage(`配置文件保存失败：${error}`);
+            vscode.window.showErrorMessage(`配置保存失败：${error}`);
             throw error;
         }
     }
@@ -94,7 +94,7 @@ export class ConfigManager {
             
             return cache;
         } catch (error) {
-            vscode.window.showErrorMessage(`翻译缓存加载失败：${error}`);
+            vscode.window.showErrorMessage(`数据加载失败：${error}`);
             return {};
         }
     }
@@ -107,7 +107,7 @@ export class ConfigManager {
             const content = JSON.stringify(cache, null, 4);
             fs.writeFileSync(this.cachePath, content, 'utf-8');
         } catch (error) {
-            vscode.window.showErrorMessage(`翻译缓存保存失败：${error}`);
+            vscode.window.showErrorMessage(`数据保存失败：${error}`);
             throw error;
         }
     }

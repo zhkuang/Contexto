@@ -88,48 +88,48 @@ export class ContextoCore {
 
         // 验证源语言字典文件路径
         if (!this.config.sourceLangDict) {
-            errors.push('sourceLangDict 配置项不能为空');
+            errors.push('源语言文件路径未设置，请指定您的主语言文件');
         } else {
             const sourceDictPath = path.resolve(this.configManager.getWorkspaceRoot(), this.config.sourceLangDict);
             if (!fs.existsSync(sourceDictPath)) {
-                errors.push(`源语言字典文件不存在: ${this.config.sourceLangDict}`);
+                errors.push(`源语言文件不存在: ${this.config.sourceLangDict}，请检查文件路径是否正确`);
             } else {
                 // 验证是否为有效的JSON文件
                 try {
                     const content = fs.readFileSync(sourceDictPath, 'utf-8');
                     JSON.parse(content);
                 } catch (error) {
-                    errors.push(`源语言字典文件格式错误: ${this.config.sourceLangDict} (${error})`);
+                    errors.push(`源语言文件格式错误: ${this.config.sourceLangDict}，请确保文件是有效的JSON格式`);
                 }
             }
         }
 
         // 验证目标语言配置 - 影响翻译功能
         if (!this.config.targetLangs || this.config.targetLangs.length === 0) {
-            warnings.push('targetLangs 配置为空，将无法进行翻译');
+            warnings.push('未设置目标语言，无法生成多语言翻译。请在配置中添加您需要的目标语言');
         }
 
         // 验证AI服务配置 - 这是核心功能，必须配置
         if (!this.config.aiService) {
-            errors.push('aiService 配置缺失');
+            errors.push('AI翻译服务未配置，请在设置中配置您的AI服务信息');
         } else {
             // API密钥是必需的
             if (!this.config.aiService.apiKey) {
-                errors.push('AI 服务 API 密钥未配置，这是插件正常工作的必需配置');
+                errors.push('AI服务密钥未设置，请在设置中添加您的API密钥');
             }
             // base URL是必需的  
             if (!this.config.aiService.base) {
-                errors.push('AI 服务 base URL 未配置，这是插件正常工作的必需配置');
+                errors.push('AI服务地址未设置，请在设置中添加您的服务地址');
             }
             // 模型配置是必需的
             if (!this.config.aiService.model) {
-                errors.push('AI 服务模型未配置，这是插件正常工作的必需配置');
+                errors.push('AI翻译模型未选择，请在设置中选择您要使用的模型');
             }
         }
 
         // 验证忽略规则
         if (!this.config.ignore || this.config.ignore.length === 0) {
-            warnings.push('ignore 配置为空，可能会扫描不必要的文件');
+            warnings.push('未设置文件忽略规则，扫描时可能包含不必要的文件，建议添加忽略规则以提高效率');
         }
 
         const isValid = errors.length === 0;
@@ -173,12 +173,12 @@ export class ContextoCore {
         }
 
         if (!this.analysis || this.analysis.obsoleteKeys.length === 0) {
-            vscode.window.showInformationMessage('当前没有需要清理的废弃文本项');
+            vscode.window.showInformationMessage('太棒了！当前没有发现已废弃的文本，无需清理');
             return;
         }
 
         const result = await vscode.window.showInformationMessage(
-            `检测到 ${this.analysis.obsoleteKeys.length} 个废弃的文本项，是否确认删除？`,
+            `发现 ${this.analysis.obsoleteKeys.length} 个已废弃的文本（代码中已不再使用）。删除这些文本可以让您的项目更整洁，是否确认删除？`,
             '确认删除',
             '取消'
         );
@@ -191,7 +191,7 @@ export class ContextoCore {
             await this.configManager.saveCache(this.cache);
             await this.refreshAnalysis();
             
-            vscode.window.showInformationMessage(`清理完成！已删除 ${this.analysis.obsoleteKeys.length} 个废弃的文本项`);
+            vscode.window.showInformationMessage(`清理完成！已删除 ${this.analysis.obsoleteKeys.length} 个废弃的文本，您的项目更整洁了`);
         }
     }
 
@@ -214,18 +214,18 @@ export class ContextoCore {
         ];
 
         if (keysToProcess.length === 0) {
-            vscode.window.showInformationMessage('当前没有需要翻译的新文本项');
+            vscode.window.showInformationMessage('太好了！所有文本都已翻译完成，无需进行翻译操作');
             return;
         }
 
         // 检查AI服务配置
         if (!this.config.aiService.apiKey) {
-            vscode.window.showErrorMessage('请先在 config.json 中配置 AI 服务的 API 密钥');
+            vscode.window.showErrorMessage('请先配置AI翻译服务密钥，然后重试');
             return;
         }
 
         const result = await vscode.window.showInformationMessage(
-            `发现 ${keysToProcess.length} 个待翻译的文本项，是否开始翻译？`,
+            `发现 ${keysToProcess.length} 个待翻译的文本。AI将根据上下文为这些文本生成高质量的翻译，是否开始翻译？`,
             '开始翻译',
             '取消'
         );
@@ -236,20 +236,20 @@ export class ContextoCore {
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: "Contexto",
+            title: "智能翻译进行中",
             cancellable: false
         }, async (progress) => {
             try {
                 // 1. 获取文件映射
-                progress.report({ message: "正在分析文件依赖关系..." });
+                progress.report({ message: "正在分析文本在代码中的使用情况..." });
                 const keyToFiles = await this.keyAnalyzer!.getMinimalFileSet(keysToProcess);
                 
                 // 2. 分析上下文
-                progress.report({ message: "正在分析文本使用上下文..." });
+                progress.report({ message: "正在理解文本的业务场景和使用上下文..." });
                 await this.analyzeContextForKeys(keysToProcess, keyToFiles);
                 
                 // 3. 执行翻译
-                progress.report({ message: "正在生成多语言翻译..." });
+                progress.report({ message: "AI正在生成多语言翻译，请稍候..." });
                 await this.performTranslation(keysToProcess);
                 
                 // 4. 保存结果
@@ -257,9 +257,9 @@ export class ContextoCore {
                 await this.configManager.saveCache(this.cache);
                 await this.refreshAnalysis();
                 
-                vscode.window.showInformationMessage(`翻译任务已完成！成功处理了 ${keysToProcess.length} 个文本项`);
+                vscode.window.showInformationMessage(`🎉 翻译任务圆满完成！成功为 ${keysToProcess.length} 个文本生成了多语言翻译`);
             } catch (error) {
-                vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
+                vscode.window.showErrorMessage(`翻译任务失败：${error}。请检查网络连接和AI服务配置`);
             }
         });
     }
@@ -522,7 +522,7 @@ export class ContextoCore {
             return {
                 success: false,
                 exportedCount: 0,
-                errors: ['配置尚未加载']
+                errors: ['配置信息尚未加载，请稍后重试']
             };
         }
 
@@ -530,7 +530,7 @@ export class ContextoCore {
             return {
                 success: false,
                 exportedCount: 0,
-                errors: ['没有可导出的翻译数据，请先执行翻译操作']
+                errors: ['暂无可导出的翻译数据，请先完成文本翻译']
             };
         }
 

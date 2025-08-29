@@ -31,7 +31,7 @@ async function updateActivityBarBadge(analysis: any | null) {
         return;
     }
     
-    // 计算需要处理的key总数（新增 + 待翻译 + 更新）
+    // 计算需要处理的文本总数（新增 + 待翻译 + 更新）
     const totalCount = (analysis.newKeys?.length || 0) + 
                       (analysis.pendingKeys?.length || 0) + 
                       (analysis.updatedKeys?.length || 0);
@@ -40,7 +40,7 @@ async function updateActivityBarBadge(analysis: any | null) {
     if (totalCount > 0) {
         treeView.badge = {
             value: totalCount,
-            tooltip: `待处理的翻译项: 新增 ${analysis.newKeys?.length || 0}, 待翻译 ${analysis.pendingKeys?.length || 0}, 已更新 ${analysis.updatedKeys?.length || 0}`
+            tooltip: `待处理文本: ${analysis.newKeys?.length || 0} 个新增, ${analysis.pendingKeys?.length || 0} 个待翻译, ${analysis.updatedKeys?.length || 0} 个已更新`
         };
     } else {
         treeView.badge = undefined;
@@ -197,7 +197,7 @@ async function setWelcomeVisibility(show: boolean) {
 const commands = {
     initProject: vscode.commands.registerCommand('contexto.initProject', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('请先打开一个有效的项目文件夹');
+            vscode.window.showErrorMessage('请先打开一个项目文件夹');
             return;
         }
 
@@ -212,7 +212,7 @@ const commands = {
             configProvider.show();
             
         } catch (error) {
-            vscode.window.showErrorMessage(`项目初始化失败：${error}`);
+            vscode.window.showErrorMessage(`初始化失败：${error}`);
         }
     }),
 
@@ -242,7 +242,7 @@ const commands = {
                 console.log('刷新完成');
             } catch (error) {
                 console.error('刷新失败:', error);
-                vscode.window.showErrorMessage(`刷新失败：${error}`);
+                vscode.window.showErrorMessage(`数据刷新失败：${error}`);
             }
         } else {
             console.log('项目未正确初始化或配置有误，刷新仅完成状态检查');
@@ -269,19 +269,19 @@ const commands = {
                 await updateActivityBarBadge(analysis);
                 
                 console.log('统计数据刷新完成');
-                vscode.window.showInformationMessage('统计数据已刷新');
+                vscode.window.showInformationMessage('数据已刷新');
             } catch (error) {
                 console.error('统计数据刷新失败:', error);
-                vscode.window.showErrorMessage(`统计数据刷新失败：${error}`);
+                vscode.window.showErrorMessage(`数据刷新失败：${error}`);
             }
         } else {
-            vscode.window.showWarningMessage('项目未初始化或配置有误，无法刷新统计数据');
+            vscode.window.showWarningMessage('请先完成项目配置，然后再试');
         }
     }),
 
     deleteKeys: vscode.commands.registerCommand('contexto.deleteKeys', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
@@ -297,13 +297,13 @@ const commands = {
             // 更新活动栏徽章
             await updateActivityBarBadge(analysis);
         } catch (error) {
-            vscode.window.showErrorMessage(`文本清理失败：${error}`);
+            vscode.window.showErrorMessage(`清理失败：${error}`);
         }
     }),
 
     translateKeys: vscode.commands.registerCommand('contexto.translateKeys', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
@@ -319,13 +319,13 @@ const commands = {
             // 更新活动栏徽章
             await updateActivityBarBadge(analysis);
         } catch (error) {
-            vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
+            vscode.window.showErrorMessage(`翻译失败：${error}`);
         }
     }),
 
     openConfig: vscode.commands.registerCommand('contexto.openConfig', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
@@ -333,7 +333,7 @@ const commands = {
             configProvider.setCore(core);
             configProvider.show();
         } catch (error) {
-            vscode.window.showErrorMessage(`打开配置页面失败：${error}`);
+            vscode.window.showErrorMessage(`配置页面打开失败：${error}`);
         }
     }),
 
@@ -341,9 +341,9 @@ const commands = {
         try {
             const logger = Logger.getInstance();
             logger.clearLog();
-            vscode.window.showInformationMessage('日志文件已清空');
+            vscode.window.showInformationMessage('日志已清空');
         } catch (error) {
-            vscode.window.showErrorMessage(`日志清空失败：${error}`);
+            vscode.window.showErrorMessage(`清空失败：${error}`);
         }
     }),
 
@@ -352,33 +352,33 @@ const commands = {
             const logger = Logger.getInstance();
             if (logger.isLoggingEnabled()) {
                 logger.disableDevLogging();
-                vscode.window.showInformationMessage('开发日志功能已关闭');
+                vscode.window.showInformationMessage('调试日志已关闭');
             } else {
                 logger.enableDevLogging();
-                vscode.window.showInformationMessage('开发日志功能已启用，日志将保存到 contexto/log.txt');
+                vscode.window.showInformationMessage('调试日志已启用，日志将保存到 contexto/log.txt');
             }
         } catch (error) {
-            vscode.window.showErrorMessage(`切换日志失败: ${error}`);
+            vscode.window.showErrorMessage(`设置失败: ${error}`);
         }
     }),
 
     exportTranslations: vscode.commands.registerCommand('contexto.exportTranslations', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
         try {
             // 1. 检查是否有可同步的数据
             if (!core.hasExportableData()) {
-                vscode.window.showWarningMessage('没有可同步的翻译数据，请先执行翻译操作');
+                vscode.window.showWarningMessage('暂无可导出的翻译数据，请先完成文本翻译');
                 return;
             }
 
             // 2. 获取同步预览
             const exportFiles = core.getExportPreview();
             if (exportFiles.length === 0) {
-                vscode.window.showWarningMessage('目标语种配置为空，请检查 config.json 中的 targetLangs 配置');
+                vscode.window.showWarningMessage('未设置目标语言，请先在配置中添加您需要的目标语言');
                 return;
             }
 
@@ -386,17 +386,17 @@ const commands = {
             const strategyChoice = await vscode.window.showQuickPick([
                 {
                     label: '仅同步已翻译内容 (推荐)',
-                    description: '只同步已有翻译的键，避免混合语言',
+                    description: '只同步已有翻译的文本，保持语言纯净性',
                     detail: 'skip',
                 },
                 {
                     label: '使用源文本填充',
-                    description: '未翻译的键使用源语言文本',
+                    description: '未翻译的文本使用原始语言填充',
                     detail: 'source',
                 }
             ], {
-                placeHolder: '选择同步策略',
-                title: '同步翻译到语言文件'
+                placeHolder: '请选择导出策略',
+                title: '将翻译同步到语言文件'
             });
 
             if (!strategyChoice) {
@@ -405,26 +405,26 @@ const commands = {
 
             // 4. 显示同步预览，询问用户确认
             const fileList = exportFiles.map(file => `• ${file}`).join('\n');
-            const confirmMessage = `即将同步翻译内容到以下文件：\n\n${fileList}\n\n策略: ${strategyChoice.label}\n\n注意：这将覆盖已存在的文件。`;
+            const confirmMessage = `将翻译内容导出到以下文件：\n\n${fileList}\n\n导出策略: ${strategyChoice.label}\n\n注意：现有文件内容将被覆盖。`;
             
             const choice = await vscode.window.showInformationMessage(
                 confirmMessage,
                 { modal: true },
-                '确认同步'
+                '确认导出'
             );
 
-            if (choice !== '确认同步') {
+            if (choice !== '确认导出') {
                 return;
             }
 
             // 5. 执行同步
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: "正在同步翻译到语言文件...",
+                title: "正在导出翻译到语言文件...",
                 cancellable: false
             }, async (progress) => {
                 if (!core) {
-                    throw new Error('Contexto 项目尚未初始化');
+                    throw new Error('请先初始化项目');
                 }
                 return await core.exportTranslations({ 
                     fallbackStrategy: strategyChoice.detail as any 
@@ -432,31 +432,31 @@ const commands = {
             });
 
             if (result.success) {
-                let successMessage = `翻译同步成功！已更新 ${result.exportedCount} 个语言文件`;
+                let successMessage = `翻译导出成功！已更新 ${result.exportedCount} 个语言文件`;
                 
                 if (result.warnings && result.warnings.length > 0) {
-                    successMessage += '\n\n注意：\n' + result.warnings.join('\n');
+                    successMessage += '\n\n提醒：\n' + result.warnings.join('\n');
                 }
                 
                 vscode.window.showInformationMessage(successMessage);
             } else {
-                const errorMessage = `翻译同步失败：\n${result.errors.join('\n')}`;
+                const errorMessage = `翻译导出失败：\n${result.errors.join('\n')}`;
                 vscode.window.showErrorMessage(errorMessage);
             }
 
         } catch (error) {
-            vscode.window.showErrorMessage(`同步翻译失败：${error}`);
+            vscode.window.showErrorMessage(`导出失败：${error}`);
         }
     }),
 
     showI18nViewer: vscode.commands.registerCommand('contexto.showI18nViewer', async () => {
         if (!core) {
-            vscode.window.showErrorMessage('Contexto 项目尚未初始化');
+            vscode.window.showErrorMessage('请先初始化项目');
             return;
         }
 
         if (core.getProjectStatus() !== ProjectStatus.INITIALIZED) {
-            vscode.window.showErrorMessage('项目配置有误，请先修复配置问题');
+            vscode.window.showErrorMessage('项目配置有误，请先修复配置');
             return;
         }
 

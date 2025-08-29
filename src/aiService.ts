@@ -79,8 +79,8 @@ export class OpenAIService implements AIService {
         } catch (error) {
             console.error(`文本上下文分析失败：`, error);
             return {
-                businessContext: '业务上下文分析失败',
-                uiContext: 'UI 上下文分析失败'
+                businessContext: '业务场景分析失败',
+                uiContext: 'UI场景分析失败'
             };
         }
     }
