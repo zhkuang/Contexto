@@ -12,6 +12,7 @@ export const defaultConfig: ContextoConfig = {
     sourceLangDict: "",
     targetLangs: [],
     ignore: ["./contexto", "./node_modules", "./.git", "./.vscode"],
+    contextLines: 5,
     aiService: {
         type: "openai",
         apiKey: "",

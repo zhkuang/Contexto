@@ -295,6 +295,13 @@ export class ConfigWebviewProvider {
             errors.push('源语言字典文件路径不能为空');
         }
 
+        // 验证上下文行数
+        if (config.contextLines !== undefined) {
+            if (!Number.isInteger(config.contextLines) || config.contextLines < 1 || config.contextLines > 20) {
+                errors.push('上下文提取行数必须是1-20之间的整数');
+            }
+        }
+
         // 验证目标语言
         if (!config.targetLangs || config.targetLangs.length === 0) {
             errors.push('至少需要配置一个目标语言');
@@ -713,6 +720,12 @@ export class ConfigWebviewProvider {
                     <button class="btn btn-secondary" onclick="selectSourceDict()">浏览</button>
                 </div>
             </div>
+
+            <div class="form-group">
+                <label class="form-label">上下文提取行数</label>
+                <div class="form-description">设置在提取文本上下文时前后各包含多少行代码，用于为翻译提供更准确的业务上下文。默认为5行。</div>
+                <input type="number" id="contextLines" class="form-input" placeholder="5" min="1" max="20" value="5" />
+            </div>
         </div>
 
         <div class="section">
@@ -1030,6 +1043,7 @@ export class ConfigWebviewProvider {
         function populateForm(config) {
             // 填充基础配置
             document.getElementById('sourceLangDict').value = config.sourceLangDict || '';
+            document.getElementById('contextLines').value = config.contextLines || 5;
             
             // 填充目标语言
             const targetLangsContainer = document.getElementById('targetLangsContainer');
@@ -1075,6 +1089,7 @@ export class ConfigWebviewProvider {
         function collectFormData() {
             const config = {
                 sourceLangDict: document.getElementById('sourceLangDict').value.trim(),
+                contextLines: parseInt(document.getElementById('contextLines').value) || 5,
                 targetLangs: [],
                 ignore: [],
                 aiService: {
