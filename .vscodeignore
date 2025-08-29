@@ -1,0 +1,32 @@
+# Source files
+src/**/*.ts
+.vscode-test/**
+.vscode/**
+
+# Compiled source
+out/test/**
+
+# Node modules (keep only necessary runtime dependencies)
+node_modules/**/.bin/**
+node_modules/**/test/**
+node_modules/**/tests/**
+node_modules/**/*.test.js
+node_modules/**/*.spec.js
+
+# Documentation files (development only)
+*.md
+!README.md
+
+# Development and build files
+tsconfig.json
+.gitignore
+.git/**
+**/.DS_Store
+
+# Test files
+test-config.json
+examples/**
+
+# Other
+**/*.map
+**/*.log

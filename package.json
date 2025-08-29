@@ -3,6 +3,11 @@
   "displayName": "Contexto",
   "description": "智能国际化翻译助手，帮助开发者进行符合业务场景和UI场景的本土化翻译",
   "version": "1.0.0",
+  "publisher": "contexto-dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhkuang/Contexto.git"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },
