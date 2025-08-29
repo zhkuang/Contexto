@@ -150,8 +150,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "tsc -p ./ && npm run copy-webview",
+    "copy-webview": "mkdir -p out/webview && cp src/webview/* out/webview/",
+    "watch": "npm run copy-webview && tsc -watch -p ./",
     "package": "vsce package",
     "clean": "rm -rf out && rm -f *.vsix"
   },
