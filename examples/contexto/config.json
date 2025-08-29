@@ -1,24 +1,13 @@
 {
-    "sourceLangDict": "./locales/zh-CN.json",
-    "targetLangs": [
-        "en",
-        "zh-TW",
-        "ja",
-        "ko",
-        "fr",
-        "de",
-        "es",
-        "pt",
-        "ru",
-        "ar",
-        "th",
-        "vi"
-    ],
+    "sourceLangDict": "",
+    "targetLangs": [],
     "ignore": [
         "./contexto",
         "./node_modules",
-        "./.git"
+        "./.git",
+        "./.vscode"
     ],
+    "contextLines": 5,
     "aiService": {
         "type": "openai",
         "apiKey": "",

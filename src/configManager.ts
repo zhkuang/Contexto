@@ -41,7 +41,6 @@ export class ConfigManager {
             await this.saveCache({});
         }
 
-        vscode.window.showInformationMessage('Contexto 项目初始化成功！请在 config.json 中配置您的 AI 服务信息。');
     }
 
     /**

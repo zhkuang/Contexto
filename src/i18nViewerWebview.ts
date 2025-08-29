@@ -111,37 +111,34 @@ export class I18nViewerWebview {
     }
 
     private _getEmptyStateHtml(): string {
-        return `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>i18n数据查看器</title>
-            <style>
-                body {
-                    font-family: var(--vscode-font-family);
-                    font-size: var(--vscode-font-size);
-                    color: var(--vscode-foreground);
-                    background-color: var(--vscode-editor-background);
-                    margin: 0;
-                    padding: 20px;
-                }
-                .empty-state {
-                    text-align: center;
-                    color: var(--vscode-descriptionForeground);
-                }
-            </style>
-        </head>
-        <body>
-            <div class="empty-state">
-                <p>请先初始化项目并配置有效的源语言字典</p>
-            </div>
-        </body>
-        </html>`;
+        // 优先使用编译输出目录，如果不存在则回退到源码目录
+        let htmlPath = path.join(__dirname, 'webview', 'i18nViewerEmpty.html');
+        
+        // 如果编译输出目录中没有webview文件，使用源码目录（开发时）
+        if (!fs.existsSync(htmlPath)) {
+            htmlPath = path.join(this._extensionUri.fsPath, 'src', 'webview', 'i18nViewerEmpty.html');
+        }
+        
+        return fs.readFileSync(htmlPath, 'utf8');
     }
 
     private _getViewerHtml(cache: I18nCache, targetLanguages: string[]): string {
         const entries = Object.entries(cache);
+        
+        // 优先使用编译输出目录，如果不存在则回退到源码目录
+        let htmlPath = path.join(__dirname, 'webview', 'i18nViewerWebview.html');
+        let jsPath = path.join(__dirname, 'webview', 'i18nViewerWebview.js');
+        
+        // 如果编译输出目录中没有webview文件，使用源码目录（开发时）
+        if (!fs.existsSync(htmlPath)) {
+            htmlPath = path.join(this._extensionUri.fsPath, 'src', 'webview', 'i18nViewerWebview.html');
+            jsPath = path.join(this._extensionUri.fsPath, 'src', 'webview', 'i18nViewerWebview.js');
+        }
+        
+        let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+        
+        // 创建脚本资源URI
+        const scriptUri = this.panel!.webview.asWebviewUri(vscode.Uri.file(jsPath));
         
         // 生成表头
         const languageHeaders = targetLanguages.map(lang => `<th class="lang-header">${lang}</th>`).join('');
@@ -165,290 +162,14 @@ export class I18nViewerWebview {
                 ${languageCells}
             </tr>`;
         }).join('');
-
-        return `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>i18n数据查看器</title>
-            <style>
-                body {
-                    font-family: var(--vscode-font-family);
-                    font-size: var(--vscode-font-size);
-                    color: var(--vscode-foreground);
-                    background-color: var(--vscode-editor-background);
-                    margin: 0;
-                    padding: 16px;
-                }
-                
-                .header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 16px;
-                    padding-bottom: 12px;
-                    border-bottom: 1px solid var(--vscode-panel-border);
-                }
-                
-                .title {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: var(--vscode-foreground);
-                }
-                
-                .toolbar {
-                    display: flex;
-                    gap: 8px;
-                }
-                
-                .btn {
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                }
-                
-                .btn:hover {
-                    background: var(--vscode-button-hoverBackground);
-                }
-                
-                .btn-secondary {
-                    background: var(--vscode-button-secondaryBackground);
-                    color: var(--vscode-button-secondaryForeground);
-                }
-                
-                .btn-secondary:hover {
-                    background: var(--vscode-button-secondaryHoverBackground);
-                }
-                
-                .table-container {
-                    max-height: calc(100vh - 120px);
-                    overflow: auto;
-                    border: 1px solid var(--vscode-panel-border);
-                    border-radius: 4px;
-                }
-                
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    background: var(--vscode-editor-background);
-                }
-                
-                th, td {
-                    border: 1px solid var(--vscode-panel-border);
-                    padding: 8px;
-                    text-align: left;
-                    vertical-align: top;
-                }
-                
-                th {
-                    background: var(--vscode-list-hoverBackground);
-                    font-weight: 600;
-                    position: sticky;
-                    top: 0;
-                    z-index: 10;
-                }
-                
-                .key-cell {
-                    width: 200px;
-                    font-family: var(--vscode-editor-font-family);
-                    font-size: 11px;
-                    background: var(--vscode-textBlockQuote-background);
-                    word-break: break-all;
-                }
-                
-                .source-cell {
-                    width: 200px;
-                    max-width: 200px;
-                    word-wrap: break-word;
-                    font-size: 12px;
-                }
-                
-                .context-cell {
-                    width: 150px;
-                    max-width: 150px;
-                    word-wrap: break-word;
-                    font-size: 11px;
-                    color: var(--vscode-descriptionForeground);
-                }
-                
-                .translation-cell {
-                    width: 180px;
-                    max-width: 180px;
-                }
-                
-                .translation-input {
-                    width: 100%;
-                    min-height: 40px;
-                    resize: vertical;
-                    border: 1px solid var(--vscode-input-border);
-                    background: var(--vscode-input-background);
-                    color: var(--vscode-input-foreground);
-                    padding: 4px;
-                    font-size: 11px;
-                    font-family: inherit;
-                    border-radius: 2px;
-                }
-                
-                .translation-input:focus {
-                    outline: 1px solid var(--vscode-focusBorder);
-                    border-color: var(--vscode-focusBorder);
-                }
-                
-                .lang-header {
-                    width: 180px;
-                    text-align: center;
-                    background: var(--vscode-list-activeSelectionBackground);
-                    color: var(--vscode-list-activeSelectionForeground);
-                }
-                
-                .stats {
-                    margin-bottom: 12px;
-                    padding: 8px 12px;
-                    background: var(--vscode-textBlockQuote-background);
-                    border-radius: 4px;
-                    font-size: 12px;
-                    color: var(--vscode-descriptionForeground);
-                }
-                
-                .file-input {
-                    display: none;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div class="title">i18n 数据查看器</div>
-                <div class="toolbar">
-                    <button class="btn btn-secondary" onclick="refreshData()">
-                        🔄 刷新
-                    </button>
-                    <button class="btn btn-secondary" onclick="exportToExcel()">
-                        📊 导出Excel
-                    </button>
-                    <button class="btn" onclick="triggerImport()">
-                        📂 导入Excel
-                    </button>
-                    <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls" onchange="handleFileImport(event)">
-                </div>
-            </div>
-            
-            <div class="stats">
-                共 ${entries.length} 个翻译键 | 目标语言: ${targetLanguages.join(', ')}
-            </div>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>原文</th>
-                            <th>业务上下文</th>
-                            <th>UI上下文</th>
-                            ${languageHeaders}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-            </div>
-            
-            <script>
-                const vscode = acquireVsCodeApi();
-                
-                // 监听来自扩展的消息
-                window.addEventListener('message', event => {
-                    const message = event.data;
-                    switch (message.type) {
-                        case 'showLoading':
-                            showLoadingStatus(message.message);
-                            break;
-                        case 'hideLoading':
-                            hideLoadingStatus();
-                            break;
-                    }
-                });
-                
-                function showLoadingStatus(message) {
-                    const refreshBtn = document.querySelector('.btn[onclick="refreshData()"]');
-                    if (refreshBtn) {
-                        refreshBtn.disabled = true;
-                        refreshBtn.textContent = message || '刷新中...';
-                    }
-                }
-                
-                function hideLoadingStatus() {
-                    const refreshBtn = document.querySelector('.btn[onclick="refreshData()"]');
-                    if (refreshBtn) {
-                        refreshBtn.disabled = false;
-                        refreshBtn.innerHTML = '🔄 刷新';
-                    }
-                }
-                
-                function refreshData() {
-                    vscode.postMessage({ type: 'refresh' });
-                }
-                
-                function exportToExcel() {
-                    vscode.postMessage({ type: 'exportExcel' });
-                }
-                
-                function triggerImport() {
-                    document.getElementById('fileInput').click();
-                }
-                
-                function handleFileImport(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            vscode.postMessage({ 
-                                type: 'importExcel', 
-                                fileContent: e.target.result,
-                                fileName: file.name 
-                            });
-                            // 清空文件输入，允许重复导入同一文件
-                            event.target.value = '';
-                        };
-                        reader.readAsArrayBuffer(file);
-                    }
-                }
-                
-                function updateTranslation(key, lang, value) {
-                    vscode.postMessage({
-                        type: 'updateTranslation',
-                        key: key,
-                        lang: lang,
-                        value: value
-                    });
-                }
-                
-                // 防抖函数
-                function debounce(func, wait) {
-                    let timeout;
-                    return function executedFunction(...args) {
-                        const later = () => {
-                            clearTimeout(timeout);
-                            func(...args);
-                        };
-                        clearTimeout(timeout);
-                        timeout = setTimeout(later, wait);
-                    };
-                }
-                
-                // 添加防抖的更新函数
-                const debouncedUpdateTranslation = debounce(updateTranslation, 500);
-            </script>
-        </body>
-        </html>`;
+        
+        // 替换模板中的占位符
+        htmlContent = htmlContent.replace('{{SCRIPT_URI}}', scriptUri.toString());
+        htmlContent = htmlContent.replace('{{STATS_CONTENT}}', `共 ${entries.length} 个翻译键 | 目标语言: ${targetLanguages.join(', ')}`);
+        htmlContent = htmlContent.replace('{{LANGUAGE_HEADERS}}', languageHeaders);
+        htmlContent = htmlContent.replace('{{TABLE_ROWS}}', tableRows);
+        
+        return htmlContent;
     }
 
     private async _exportToExcel() {

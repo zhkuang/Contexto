@@ -142,36 +142,29 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     private _getEmptyStateHtml(): string {
-        return `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>统计数据</title>
-            <style>
-                body {
-                    font-family: var(--vscode-font-family);
-                    font-size: var(--vscode-font-size);
-                    color: var(--vscode-foreground);
-                    background-color: var(--vscode-editor-background);
-                    margin: 0;
-                    padding: 20px;
-                }
-                .empty-state {
-                    text-align: center;
-                    color: var(--vscode-descriptionForeground);
-                }
-            </style>
-        </head>
-        <body>
-            <div class="empty-state">
-                <p>请先初始化项目并配置有效的源语言字典</p>
-            </div>
-        </body>
-        </html>`;
+        // 优先使用编译输出目录，如果不存在则回退到源码目录
+        let htmlPath = path.join(__dirname, 'webview', 'statsEmpty.html');
+        
+        // 如果编译输出目录中没有webview文件，使用源码目录（开发时）
+        if (!fs.existsSync(htmlPath)) {
+            htmlPath = path.join(this._extensionUri.fsPath, 'src', 'webview', 'statsEmpty.html');
+        }
+        
+        return fs.readFileSync(htmlPath, 'utf8');
     }
 
     private _getStatsHtml(stats: any): string {
+        // 优先使用编译输出目录，如果不存在则回退到源码目录
+        let htmlPath = path.join(__dirname, 'webview', 'statsWebview.html');
+        
+        // 如果编译输出目录中没有webview文件，使用源码目录（开发时）
+        if (!fs.existsSync(htmlPath)) {
+            htmlPath = path.join(this._extensionUri.fsPath, 'src', 'webview', 'statsWebview.html');
+        }
+        
+        let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+        
+        // 生成语言统计HTML
         const languageStatsHtml = Object.entries(stats.cacheStats.byLanguage)
             .map(([lang, count]) => {
                 const total = stats.cacheStats.totalKeys;
@@ -184,144 +177,14 @@ export class StatsWebviewProvider implements vscode.WebviewViewProvider {
                     <span class="stat-value ${statusClass}">${count}</span>
                 </div>
             `;}).join('');
-
-        return `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>统计数据</title>
-            <style>
-                body {
-                    font-family: var(--vscode-font-family);
-                    font-size: var(--vscode-font-size);
-                    color: var(--vscode-foreground);
-                    background-color: var(--vscode-editor-background);
-                    margin: 0;
-                    padding: 12px;
-                    line-height: 1.3;
-                }
-                
-                .stats-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                }
-                
-                .overview-cards {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 8px;
-                    margin-bottom: 6px;
-                }
-                
-                .overview-card {
-                    background: var(--vscode-inputOption-hoverBackground);
-                    border-radius: 6px;
-                    padding: 10px;
-                    text-align: center;
-                }
-                
-                .overview-number {
-                    font-size: 18px;
-                    font-weight: 700;
-                    color: var(--vscode-charts-blue);
-                    display: block;
-                    margin-bottom: 3px;
-                }
-                
-                .overview-label {
-                    font-size: 10px;
-                    color: var(--vscode-descriptionForeground);
-                    text-transform: uppercase;
-                    letter-spacing: 0.3px;
-                }
-                
-                .stat-group {
-                    border: 1px solid var(--vscode-panel-border);
-                    border-radius: 6px;
-                    padding: 12px;
-                    background-color: var(--vscode-editor-background);
-                }
-                
-                .stat-group-title {
-                    font-weight: 600;
-                    margin-bottom: 8px;
-                    color: var(--vscode-foreground);
-                    font-size: 13px;
-                }
-                
-                .stat-item {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 6px 0;
-                    border-bottom: 1px solid var(--vscode-widget-border);
-                }
-                
-                .stat-item:last-child {
-                    border-bottom: none;
-                }
-                
-                .stat-label {
-                    color: var(--vscode-descriptionForeground);
-                    font-size: 12px;
-                }
-                
-                .stat-value {
-                    font-weight: 600;
-                    color: var(--vscode-foreground);
-                    font-size: 13px;
-                }
-                
-                .stat-value.highlight {
-                    color: var(--vscode-charts-blue);
-                    font-size: 15px;
-                }
-                
-                .stat-value.warning {
-                    color: var(--vscode-charts-orange);
-                }
-                
-                .stat-value.success {
-                    color: var(--vscode-charts-green);
-                }
-                
-                .total-cache {
-                    background-color: var(--vscode-inputOption-hoverBackground);
-                    border-radius: 3px;
-                    padding: 3px 6px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="stats-container">
-                <div class="stat-group">
-                    <div class="stat-group-title">源字典分析</div>
-                    <div class="stat-item">
-                        <span class="stat-label">原始Key总数</span>
-                        <span class="stat-value highlight">${stats.originalKeysCount}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">未使用Key数量</span>
-                        <span class="stat-value ${stats.unusedKeysCount > 0 ? 'warning' : ''}">${stats.unusedKeysCount}</span>
-                    </div>
-                </div>
-                
-                <div class="stat-group">
-                    <div class="stat-group-title">翻译缓存</div>
-                    <div class="stat-item">
-                        <span class="stat-label">已处理Key数量</span>
-                        <span class="stat-value total-cache">${stats.cacheStats.totalKeys}</span>
-                    </div>
-                </div>
-                
-                <div class="stat-group">
-                    <div class="stat-group-title">各语言翻译进度</div>
-                    ${languageStatsHtml}
-                </div>
-            </div>
-        </body>
-        </html>`;
+        
+        // 替换模板中的占位符
+        htmlContent = htmlContent.replace('{{ORIGINAL_KEYS_COUNT}}', stats.originalKeysCount.toString());
+        htmlContent = htmlContent.replace('{{UNUSED_KEYS_COUNT}}', stats.unusedKeysCount.toString());
+        htmlContent = htmlContent.replace('{{UNUSED_KEYS_CLASS}}', stats.unusedKeysCount > 0 ? 'warning' : '');
+        htmlContent = htmlContent.replace('{{TOTAL_CACHE_KEYS}}', stats.cacheStats.totalKeys.toString());
+        htmlContent = htmlContent.replace('{{LANGUAGE_STATS}}', languageStatsHtml);
+        
+        return htmlContent;
     }
 }
