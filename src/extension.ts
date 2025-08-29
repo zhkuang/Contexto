@@ -17,6 +17,35 @@ let configErrorProvider: ConfigErrorWebviewProvider;
 let configProvider: ConfigWebviewProvider;
 let statsProvider: StatsWebviewProvider;
 let i18nViewer: I18nViewerWebview;
+let treeView: vscode.TreeView<any>; // 添加TreeView引用
+
+// 更新活动栏徽章
+async function updateActivityBarBadge(analysis: any | null) {
+    if (!treeView) {
+        return;
+    }
+    
+    if (!analysis) {
+        // 清除徽章
+        treeView.badge = undefined;
+        return;
+    }
+    
+    // 计算需要处理的key总数（新增 + 待翻译 + 更新）
+    const totalCount = (analysis.newKeys?.length || 0) + 
+                      (analysis.pendingKeys?.length || 0) + 
+                      (analysis.updatedKeys?.length || 0);
+    
+    // 设置徽章数字
+    if (totalCount > 0) {
+        treeView.badge = {
+            value: totalCount,
+            tooltip: `待处理的翻译项: 新增 ${analysis.newKeys?.length || 0}, 待翻译 ${analysis.pendingKeys?.length || 0}, 已更新 ${analysis.updatedKeys?.length || 0}`
+        };
+    } else {
+        treeView.badge = undefined;
+    }
+}
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Contexto插件已激活');
@@ -31,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
     i18nViewer = new I18nViewerWebview(context.extensionUri);
 
     // 注册tree view
-    const treeView = vscode.window.createTreeView('contexto', {
+    treeView = vscode.window.createTreeView('contexto', {
         treeDataProvider: treeProvider,
         showCollapseAll: true
     });
@@ -94,6 +123,7 @@ async function initializeWorkspace() {
         await treeProvider.setCore(null);
         statsProvider.setCore(null);
         configProvider.setCore(null);
+        await updateActivityBarBadge(null);
         return;
     }
 
@@ -110,6 +140,7 @@ async function initializeWorkspace() {
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
         configProvider.setCore(core);
+        await updateActivityBarBadge(null);
         return;
     }
 
@@ -126,6 +157,7 @@ async function initializeWorkspace() {
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
         configProvider.setCore(core);
+        await updateActivityBarBadge(null);
         return;
     }
     
@@ -139,6 +171,7 @@ async function initializeWorkspace() {
         statsProvider.setCore(core);
         configProvider.setCore(core);
         i18nViewer.setCore(core);
+        await updateActivityBarBadge(analysis);
     } else {
         // 未知状态，为了安全起见，显示配置错误界面
         console.log('未知项目状态，显示配置错误界面');
@@ -147,6 +180,7 @@ async function initializeWorkspace() {
         statusProvider.updateStatus(core, null);
         statsProvider.setCore(core);
         configProvider.setCore(core);
+        await updateActivityBarBadge(null);
     }
 }
 
@@ -202,6 +236,9 @@ const commands = {
                 // 刷新统计面板
                 statsProvider.refresh();
                 
+                // 更新活动栏徽章
+                await updateActivityBarBadge(analysis);
+                
                 console.log('刷新完成');
             } catch (error) {
                 console.error('刷新失败:', error);
@@ -228,6 +265,9 @@ const commands = {
                 // 刷新统计面板
                 statsProvider.refresh();
                 
+                // 更新活动栏徽章
+                await updateActivityBarBadge(analysis);
+                
                 console.log('统计数据刷新完成');
                 vscode.window.showInformationMessage('统计数据已刷新');
             } catch (error) {
@@ -253,6 +293,9 @@ const commands = {
             
             // 刷新统计面板
             statsProvider.refresh();
+            
+            // 更新活动栏徽章
+            await updateActivityBarBadge(analysis);
         } catch (error) {
             vscode.window.showErrorMessage(`文本清理失败：${error}`);
         }
@@ -272,6 +315,9 @@ const commands = {
             
             // 刷新统计面板
             statsProvider.refresh();
+            
+            // 更新活动栏徽章
+            await updateActivityBarBadge(analysis);
         } catch (error) {
             vscode.window.showErrorMessage(`翻译任务执行失败：${error}`);
         }
