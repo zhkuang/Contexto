@@ -6,8 +6,8 @@ build/
 # 依赖
 node_modules/
 
-# 包文件
-*.vsix
+# # 包文件
+# *.vsix
 
 # 测试文件
 test-*.js
