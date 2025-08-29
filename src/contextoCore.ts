@@ -236,7 +236,7 @@ export class ContextoCore {
 
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: "AI 翻译处理中",
+            title: "Contexto",
             cancellable: false
         }, async (progress) => {
             try {
